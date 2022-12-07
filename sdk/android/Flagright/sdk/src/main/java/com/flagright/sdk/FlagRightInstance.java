@@ -1,10 +1,13 @@
 package com.flagright.sdk;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.biometrics.BiometricManager;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -14,6 +17,9 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
+import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.scottyab.rootbeer.RootBeer;
 
 import java.net.Inet4Address;
@@ -154,5 +160,35 @@ public class FlagRightInstance {
      */
     public int fetchContactsCount(Context context) {
         return ContactsFetcher.getTotalContactsCount(context);
+    }
+
+    /**
+     * Required permissions
+     * <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+     * <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+     * Method returns the current location
+     * @param context instance of an Activity
+     * @param locationFoundCallback {@link LocationFoundCallback} it an interface that returns location on success otherwise error
+     */
+    public void fetchCurrentLocation(Context context, LocationFoundCallback locationFoundCallback) {
+        if (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED) {
+            LocationFetcher fetcher = new LocationFetcher();
+            fetcher.init(context, new LocationFoundCallback() {
+                @Override
+                public void locationFound(Location location) {
+                    locationFoundCallback.locationFound(location);
+                }
+
+                @Override
+                public void locationError(String error) {
+                    locationFoundCallback.locationError(error);
+                }
+            });
+        } else {
+            locationFoundCallback.locationError("App does not have location permission");
+        }
     }
 }

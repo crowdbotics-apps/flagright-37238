@@ -1,17 +1,25 @@
 package com.flagright;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.flagright.sdk.FlagRightInstance;
+import com.flagright.sdk.interfaces.LocationFoundCallback;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
+    private TextView locationTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         TextView biometric = findViewById(R.id.biometric);
         biometric.setText("Biometric enabled: " + flagRightInstance.isBioMetricEnabled(this));
         TextView rooted = findViewById(R.id.rooted);
+        locationTextView = findViewById(R.id.location);
         new Thread(() -> {
             boolean isRooted = flagRightInstance.isDeviceRooted(MainActivity.this);
             runOnUiThread(() -> {
@@ -41,33 +50,71 @@ public class MainActivity extends AppCompatActivity {
             });
         }).start();
 
-        checkContactsPermission();
+        requestAppPermissions();
+
+        fetchContacts();
+
+        // for location
+        initiateLocation();
+    }
+
+    private void requestAppPermissions() {
+        ArrayList<String> permissions = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.READ_CONTACTS);
+        }
+        if (permissions.size() > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                String[] permissionStrings = new String[permissions.size()];
+                for (int i =0; i<permissions.size(); i++) {
+                    permissionStrings[i] = permissions.get(i);
+                }
+                requestPermissions(permissionStrings, 1001);
+            }
+        }
+    }
+
+    private void initiateLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fetchLocation();
+        }
+    }
+
+    private void fetchLocation() {
+        FlagRightInstance.getInstance().fetchCurrentLocation(this, new LocationFoundCallback() {
+            @Override
+            public void locationFound(Location location) {
+                Log.i("Location", location.toString());
+                locationTextView.setText(new StringBuilder().append("Location: ")
+                        .append(location.getLatitude()).append(", ")
+                        .append(location.getLongitude()).toString());
+            }
+
+            @Override
+            public void locationError(String error) {
+                locationTextView.setText(new StringBuilder().append("Location: ").append(error));
+            }
+        });
     }
 
     private void fetchContacts() {
-        TextView contactsCount = findViewById(R.id.contactsCount);
-        contactsCount.setText(new StringBuilder().append("Total Contacts: ").append(FlagRightInstance.getInstance().fetchContactsCount(this)).toString());
-    }
-
-    private void checkContactsPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
-            fetchContacts();
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
-                // In an educational UI, explain to the user why your app requires this
-                // permission for a specific feature to behave as expected, and what
-                // features are disabled if it's declined. In this UI, include a
-                // "cancel" or "no thanks" button that lets the user continue
-                // using your app without granting the permission.
-//                showInContextUI(...);
-            } else {
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
-                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1001);
-            }
+            TextView contactsCount = findViewById(R.id.contactsCount);
+            contactsCount.setText(new StringBuilder().append("Total Contacts: ")
+                    .append(FlagRightInstance.getInstance().fetchContactsCount(this)).toString());
         }
     }
 
@@ -75,22 +122,29 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.i("grantResults", Arrays.toString(grantResults));
+        Log.i("permissions", Arrays.toString(permissions));
         switch (requestCode) {
             case 1001:
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 1 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1]== PackageManager.PERMISSION_GRANTED) {
                     // Permission is granted. Continue the action or workflow
                     // in your app.
-                    fetchContacts();
+                    fetchLocation();
                 } else {
                     // Explain to the user that the feature is unavailable because
                     // the feature requires a permission that the user has denied.
                     // At the same time, respect the user's decision. Don't link to
                     // system settings in an effort to convince the user to change
                     // their decision.
+                    locationTextView.setText(new StringBuilder().append("Location: App does not have location permission"));
+                }
+                if (grantResults.length>2 && grantResults[2]== PackageManager.PERMISSION_GRANTED) {
+                    fetchContacts();
                 }
                 return;
+
         }
         // Other 'case' lines to check for other
         // permissions this app might request.
