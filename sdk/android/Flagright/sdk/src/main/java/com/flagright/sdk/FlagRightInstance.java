@@ -3,12 +3,15 @@ package com.flagright.sdk;
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.database.Cursor;
 import android.hardware.biometrics.BiometricManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.scottyab.rootbeer.RootBeer;
@@ -141,5 +144,15 @@ public class FlagRightInstance {
     public boolean isDeviceRooted(Context context) {
         RootBeer rootBeer = new RootBeer(context);
         return rootBeer.isRooted();
+    }
+
+    /**
+     * Requires READ_CONTACTS permission
+     * Method fetch total number contacts
+     * @param context Application context
+     * @return total number of contacts
+     */
+    public int fetchContactsCount(Context context) {
+        return ContactsFetcher.getTotalContactsCount(context);
     }
 }

@@ -59,6 +59,12 @@
                 android:layout_height="wrap_content"
                 android:text= "Is Real Device"
                 />
+            <TextView
+                android:id="@+id/contactsCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Total Contacts"
+                />
         </LinearLayout>
     </ScrollView>
 
