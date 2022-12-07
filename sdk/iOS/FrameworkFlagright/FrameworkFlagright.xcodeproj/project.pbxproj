@@ -12,6 +12,7 @@
 		08E85AEE293F5AB500B35B10 /* FrameworkFlagrightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85AED293F5AB500B35B10 /* FrameworkFlagrightTests.swift */; };
 		08E85AEF293F5AB500B35B10 /* FrameworkFlagright.h in Headers */ = {isa = PBXBuildFile; fileRef = 08E85AE1293F5AB400B35B10 /* FrameworkFlagright.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		08E85B39293F620E00B35B10 /* DataCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85B38293F620E00B35B10 /* DataCollection.swift */; };
+		08E85B402940791B00B35B10 /* UIDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,6 +32,7 @@
 		08E85AE8293F5AB500B35B10 /* FrameworkFlagrightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FrameworkFlagrightTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		08E85AED293F5AB500B35B10 /* FrameworkFlagrightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameworkFlagrightTests.swift; sourceTree = "<group>"; };
 		08E85B38293F620E00B35B10 /* DataCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCollection.swift; sourceTree = "<group>"; };
+		08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDeviceExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 				08E85AE1293F5AB400B35B10 /* FrameworkFlagright.h */,
 				08E85AE2293F5AB400B35B10 /* FrameworkFlagright.docc */,
 				08E85B38293F620E00B35B10 /* DataCollection.swift */,
+				08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */,
 			);
 			path = FrameworkFlagright;
 			sourceTree = "<group>";
@@ -197,6 +200,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08E85B402940791B00B35B10 /* UIDeviceExtension.swift in Sources */,
 				08E85AE3293F5AB400B35B10 /* FrameworkFlagright.docc in Sources */,
 				08E85B39293F620E00B35B10 /* DataCollection.swift in Sources */,
 			);
