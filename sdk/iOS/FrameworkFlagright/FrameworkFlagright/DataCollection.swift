@@ -7,6 +7,8 @@
 
 import Foundation
 import UIKit
+import Contacts
+import ContactsUI
 
 public class DataCollection {
     
@@ -19,7 +21,9 @@ public class DataCollection {
     public let ram = ProcessInfo.processInfo.physicalMemory/(1024 * 1024 * 1024)
     public let systemVersion = UIDevice.current.systemVersion
     public let maker = "Apple"
-    public let modelName = UIDevice.modelName
+    public let modelName = UIDevice.modelName 
+    
+    public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
     
     public func isSimulator() -> String{
 #if targetEnvironment(simulator)

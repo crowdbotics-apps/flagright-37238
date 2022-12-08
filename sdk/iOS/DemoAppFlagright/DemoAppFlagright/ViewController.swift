@@ -27,6 +27,9 @@ class ViewController: UIViewController {
         print("The maker is \(deviceData.maker)")
         print("The battery is \(deviceData.getBattery())")
         print("The VPN connection status is \(deviceData.isConnectedToVpn)")
+        
+        print("The jailbreak status is \(deviceData.jailBreakStatus())")
+
 
         
 

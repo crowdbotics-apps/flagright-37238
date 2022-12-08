@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08DA706A2941B812003E19BB /* UIDeviceExtension+Jailbreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08DA70692941B812003E19BB /* UIDeviceExtension+Jailbreak.swift */; };
 		08E85AE3293F5AB400B35B10 /* FrameworkFlagright.docc in Sources */ = {isa = PBXBuildFile; fileRef = 08E85AE2293F5AB400B35B10 /* FrameworkFlagright.docc */; };
 		08E85AE9293F5AB500B35B10 /* FrameworkFlagright.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08E85ADE293F5AB400B35B10 /* FrameworkFlagright.framework */; };
 		08E85AEE293F5AB500B35B10 /* FrameworkFlagrightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85AED293F5AB500B35B10 /* FrameworkFlagrightTests.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		08DA70692941B812003E19BB /* UIDeviceExtension+Jailbreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDeviceExtension+Jailbreak.swift"; sourceTree = "<group>"; };
 		08E85ADE293F5AB400B35B10 /* FrameworkFlagright.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FrameworkFlagright.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		08E85AE1293F5AB400B35B10 /* FrameworkFlagright.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FrameworkFlagright.h; sourceTree = "<group>"; };
 		08E85AE2293F5AB400B35B10 /* FrameworkFlagright.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = FrameworkFlagright.docc; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				08E85AE1293F5AB400B35B10 /* FrameworkFlagright.h */,
 				08E85AE2293F5AB400B35B10 /* FrameworkFlagright.docc */,
 				08E85B38293F620E00B35B10 /* DataCollection.swift */,
+				08DA70692941B812003E19BB /* UIDeviceExtension+Jailbreak.swift */,
 				08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */,
 			);
 			path = FrameworkFlagright;
@@ -201,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				08E85B402940791B00B35B10 /* UIDeviceExtension.swift in Sources */,
+				08DA706A2941B812003E19BB /* UIDeviceExtension+Jailbreak.swift in Sources */,
 				08E85AE3293F5AB400B35B10 /* FrameworkFlagright.docc in Sources */,
 				08E85B39293F620E00B35B10 /* DataCollection.swift in Sources */,
 			);
