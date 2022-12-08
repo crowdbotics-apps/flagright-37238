@@ -13,18 +13,20 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let deviceData = DataCollection()
-        print(deviceData.name)
         
         print("The device ID is \(deviceData.deviceID)")
         print("The device language is \(deviceData.language ?? "Error")")
         print("The device country is \(deviceData.country ?? "Error")")
-        print("The available memory is \(deviceData.ram) GB")
+        print("The device localTimeZone \(deviceData.localTimeZoneAbbreviation)")
+        print("The available RAM is \(deviceData.ram) GB")
         deviceData.availableMemory()
         deviceData.totalMemory()
         print("The device is \(deviceData.isSimulator())")
         print("The ios version is \(deviceData.systemVersion)")
         print("The model is \(deviceData.modelName)")
         print("The maker is \(deviceData.maker)")
+        print("The battery is \(deviceData.getBattery())")
+        print("The VPN connection status is \(deviceData.isConnectedToVpn)")
 
         
 

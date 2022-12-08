@@ -13,7 +13,6 @@ public class DataCollection {
     public init() {
     }
      
-    public let name = "foo"
     public let deviceID = UIDevice.current.identifierForVendor!.uuidString
     public let language = NSLocale.current.languageCode
     public let country = NSLocale.current.regionCode
@@ -58,7 +57,25 @@ public class DataCollection {
     }
     }
     
+    public var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
     
+    public func getBattery()->Float{
+        UIDevice.current.isBatteryMonitoringEnabled = true
+        let level = UIDevice.current.batteryLevel
+        return level
+    }
+    
+    public var isConnectedToVpn: Bool {
+        if let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? Dictionary<String, Any>,
+            let scopes = settings["__SCOPED__"] as? [String:Any] {
+            for (key, _) in scopes {
+             if key.contains("tap") || key.contains("tun") || key.contains("ppp") || key.contains("ipsec") {
+                    return true
+                }
+            }
+        }
+        return false
+    }
     
 }
 
