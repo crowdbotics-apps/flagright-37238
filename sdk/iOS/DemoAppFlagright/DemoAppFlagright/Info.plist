@@ -4,10 +4,18 @@
 <dict>
 	<key>CFBundleIdentifier</key>
 	<string></string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>App wants your location</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>App needs your location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App wants your location</string>
+	<key>NSContactsUsageDescription</key>
+	<string>App wants your contact info</string>
 	<key>LSApplicationQueriesSchemes</key>
-<array>
-    <string>cydia</string>
-</array>
+	<array>
+		<string>cydia</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
