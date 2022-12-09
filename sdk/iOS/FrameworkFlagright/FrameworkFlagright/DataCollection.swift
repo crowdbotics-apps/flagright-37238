@@ -18,7 +18,7 @@ public class DataCollection {
     public let deviceID = UIDevice.current.identifierForVendor!.uuidString
     public let language = NSLocale.current.languageCode
     public let country = NSLocale.current.regionCode
-    public let ram = ProcessInfo.processInfo.physicalMemory/(1024 * 1024 * 1024)
+    public let ram = ProcessInfo.processInfo.physicalMemory
     public let systemVersion = UIDevice.current.systemVersion
     public let maker = "Apple"
     public let modelName = UIDevice.modelName 
@@ -31,6 +31,64 @@ public class DataCollection {
 #else
   return "Real Device"
 #endif
+    }
+    
+    public func checkAccessibilityEnabled()->Bool{
+        if UIAccessibility.isAssistiveTouchRunning{
+            return true
+        }
+        if UIAccessibility.isBoldTextEnabled{
+            return true
+        }
+        if UIAccessibility.isClosedCaptioningEnabled{
+            return true
+        }
+        if UIAccessibility.isDarkerSystemColorsEnabled{
+            return true
+        }
+        if UIAccessibility.isGrayscaleEnabled{
+            return true
+        }
+        if UIAccessibility.isGuidedAccessEnabled{
+            return true
+        }
+        if UIAccessibility.isInvertColorsEnabled{
+            return true
+        }
+        if UIAccessibility.isMonoAudioEnabled{
+            return true
+        }
+        if UIAccessibility.isOnOffSwitchLabelsEnabled{
+            return true
+        }
+        if UIAccessibility.isReduceMotionEnabled{
+            return true
+        }
+        if UIAccessibility.isReduceTransparencyEnabled{
+            return true
+        }
+        if UIAccessibility.isSpeakScreenEnabled{
+            return true
+        }
+        if UIAccessibility.isSpeakSelectionEnabled{
+            return true
+        }
+//        if UIAccessibility.isShakeToUndoEnabled{
+//            return true
+//        }
+        if UIAccessibility.isSwitchControlRunning{
+            return true
+        }
+//        if UIAccessibility.isVideoAutoplayEnabled{
+//            return true
+//        }
+        if UIAccessibility.isVoiceOverRunning{
+            return true
+        }
+        if UIAccessibility.shouldDifferentiateWithoutColor{
+            return true
+        }
+        return false
     }
  
     public func availableMemory(){

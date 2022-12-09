@@ -10,6 +10,7 @@ import FrameworkFlagright
 import CoreLocation
 import Contacts
 import ContactsUI
+import Accessibility
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
@@ -18,6 +19,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let keysToFetch = [CNContactGivenNameKey]
     var contactArray = [String]()
     
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         let deviceData = DataCollection()
@@ -27,7 +29,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("The device language is \(deviceData.language ?? "Error")")
         print("The device country is \(deviceData.country ?? "Error")")
         print("The device localTimeZone \(deviceData.localTimeZoneAbbreviation)")
-        print("The available RAM is \(deviceData.ram) GB")
+        print("The total RAM is \(deviceData.ram)")
         deviceData.availableMemory()
         deviceData.totalMemory()
         print("The device is \(deviceData.isSimulator())")
@@ -38,6 +40,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("The VPN connection status is \(deviceData.isConnectedToVpn)")
         
         print("The jailbreak status is \(deviceData.jailBreakStatus())")
+        
+        print("Checking accesibility \(deviceData.checkAccessibilityEnabled())")
 
         do {
              try store.enumerateContacts(with: CNContactFetchRequest.init(keysToFetch: keysToFetch as [CNKeyDescriptor]), usingBlock: { (contact, pointer) -> Void in
