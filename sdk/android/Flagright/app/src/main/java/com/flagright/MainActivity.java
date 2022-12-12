@@ -56,6 +56,35 @@ public class MainActivity extends AppCompatActivity {
 
         // for location
         initiateLocation();
+
+        // get Battery level
+        TextView batteryLevel = findViewById(R.id.batteryLevel);
+        batteryLevel.setText(new StringBuilder()
+                .append("Battery Level: ")
+                .append(flagRightInstance.getBatteryLevel(this).getLevel()));
+
+       // total internal storage
+        TextView internalStorageTextView = findViewById(R.id.internalStorage);
+        internalStorageTextView.setText(new StringBuilder()
+                .append("Storage ")
+                .append(flagRightInstance.getTotalInternalStorage()).append(" GB"));
+
+        // free internal storage
+        TextView freeInternalStorageTextView = findViewById(R.id.freeInternal);
+        freeInternalStorageTextView.setText(new StringBuilder()
+                .append("Free Storage ")
+                .append(flagRightInstance.getFreeInternalStorage()).append(" GB"));
+
+        // total external storage
+        TextView totalExternalStorage = findViewById(R.id.totalExternalStorage);
+        totalExternalStorage.setText(new StringBuilder()
+                .append("External Storage ")
+                .append(flagRightInstance.getExternalSdCardSize(false)).append(" GB"));
+        //free external storage
+        TextView freeExternalStorage = findViewById(R.id.freeExternalStorage);
+        freeExternalStorage.setText(new StringBuilder()
+                .append("External Storage Free ")
+                .append(flagRightInstance.getExternalSdCardSize(true)).append(" GB"));
     }
 
     private void requestAppPermissions() {
@@ -107,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
                 locationTextView.setText(new StringBuilder().append("Location: ").append(error));
             }
         });
+
+        TextView locationEnTextView = findViewById(R.id.locationEnabled);
+        locationEnTextView.setText(new StringBuilder().append("Location Enabled: ")
+                .append(FlagRightInstance.getInstance().isLocationEnabled(this)));
     }
 
     private void fetchContacts() {

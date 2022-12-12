@@ -71,6 +71,42 @@
                 android:layout_height="wrap_content"
                 android:text= "Location"
                 />
+            <TextView
+                android:id="@+id/locationEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Location Enabled"
+                />
+            <TextView
+                android:id="@+id/batteryLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Battery Level"
+                />
+            <TextView
+                android:id="@+id/internalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Internal Storage"
+                />
+            <TextView
+                android:id="@+id/freeInternal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Internal Storage"
+                />
+            <TextView
+                android:id="@+id/totalExternalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "External Storage"
+                />
+            <TextView
+                android:id="@+id/freeExternalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "External Storage"
+                />
         </LinearLayout>
     </ScrollView>
 
