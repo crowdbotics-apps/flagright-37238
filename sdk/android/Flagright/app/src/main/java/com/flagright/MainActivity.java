@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.flagright.sdk.FlagRightInstance;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
@@ -66,25 +67,87 @@ public class MainActivity extends AppCompatActivity {
        // total internal storage
         TextView internalStorageTextView = findViewById(R.id.internalStorage);
         internalStorageTextView.setText(new StringBuilder()
-                .append("Storage ")
+                .append("Storage: ")
                 .append(flagRightInstance.getTotalInternalStorage()).append(" GB"));
 
         // free internal storage
         TextView freeInternalStorageTextView = findViewById(R.id.freeInternal);
         freeInternalStorageTextView.setText(new StringBuilder()
-                .append("Free Storage ")
+                .append("Free Storage: ")
                 .append(flagRightInstance.getFreeInternalStorage()).append(" GB"));
 
         // total external storage
         TextView totalExternalStorage = findViewById(R.id.totalExternalStorage);
         totalExternalStorage.setText(new StringBuilder()
-                .append("External Storage ")
+                .append("External Storage: ")
                 .append(flagRightInstance.getExternalSdCardSize(false)).append(" GB"));
         //free external storage
         TextView freeExternalStorage = findViewById(R.id.freeExternalStorage);
         freeExternalStorage.setText(new StringBuilder()
-                .append("External Storage Free ")
+                .append("External Storage Free: ")
                 .append(flagRightInstance.getExternalSdCardSize(true)).append(" GB"));
+        // get Modal name
+        TextView modal = findViewById(R.id.modal);
+        modal.setText(new StringBuilder()
+                .append("Modal: ")
+                .append(flagRightInstance.getModalName()));
+        // get Manufacture name
+        TextView manufacture = findViewById(R.id.manufacture);
+        manufacture.setText(new StringBuilder()
+                .append("Manufacture: ")
+                .append(flagRightInstance.getManufactureName()));
+        // get OS version
+        TextView osVersion = findViewById(R.id.os);
+        osVersion.setText(new StringBuilder()
+                .append("OS: ")
+                .append(flagRightInstance.getOSVersion()));
+        // get language version
+        TextView languageCode = findViewById(R.id.languageCode);
+        languageCode.setText(new StringBuilder()
+                .append("Language: ")
+                .append(flagRightInstance.getDeviceLocaleLanguageCode()));
+        // get country code
+        TextView countryCode = findViewById(R.id.countryCode);
+        countryCode.setText(new StringBuilder()
+                .append("Country Code: ")
+                .append(flagRightInstance.getDeviceLocaleCountry()));
+        // get timezone
+        TextView timeZone = findViewById(R.id.timeZone);
+        timeZone.setText(new StringBuilder()
+                .append("TimeZone: ")
+                .append(flagRightInstance.getDeviceTimeZone()));
+        // get ram size
+        TextView ramSize = findViewById(R.id.ramSize);
+        ramSize.setText(new StringBuilder()
+                .append("RAM: ")
+                .append(flagRightInstance.getRamSize(this))
+                .append(" GB"));
+        // data roaming
+        TextView roaming = findViewById(R.id.roaming);
+        roaming.setText(new StringBuilder()
+                .append("Roaming enabled: ")
+                .append(flagRightInstance.isDataRoamingEnabled(this)));
+        // Accessibility
+        TextView accessibility = findViewById(R.id.accessibility);
+        accessibility.setText(new StringBuilder()
+                .append("Accessibility enabled: ")
+                .append(flagRightInstance.isAccessibilityEnabled(this)));
+        // Bluetooth
+        TextView bluetoothEnabled = findViewById(R.id.bluetooth);
+        bluetoothEnabled.setText(new StringBuilder()
+                .append("Bluetooth enabled: ")
+                .append(flagRightInstance.isBluetoothEnabled().isEnable()));
+        // Network Operator
+        TextView networkOperator = findViewById(R.id.networkOperator);
+        networkOperator.setText(new StringBuilder()
+                .append("Network Operator: ")
+                .append(flagRightInstance.getNetworkOperatorName(this)));
+        // Fingerprint
+        TextView fingerPrint = findViewById(R.id.fingerPrint);
+        fingerPrint.setText(new StringBuilder()
+                .append("Fingerprint: ")
+                .append(flagRightInstance.getFingerprint()));
+        System.out.println("FingerPrint: "+flagRightInstance.getFingerprint());
     }
 
     private void requestAppPermissions() {

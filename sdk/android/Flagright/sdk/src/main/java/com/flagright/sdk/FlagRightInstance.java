@@ -2,7 +2,9 @@ package com.flagright.sdk;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -16,6 +18,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.provider.ContactsContract;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,18 +27,23 @@ import androidx.core.content.ContextCompat;
 
 import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
+import com.flagright.sdk.models.BluetoothResponseModal;
 import com.scottyab.rootbeer.RootBeer;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class FlagRightInstance {
     private static FlagRightInstance mFlagRightInstance;
@@ -231,6 +240,7 @@ public class FlagRightInstance {
 
     /**
      * Method return the total internal storage in GB provided by {@link Environment} class of Android SDK
+     *
      * @return size of internal storage in GB
      */
     public double getTotalInternalStorage() {
@@ -239,20 +249,175 @@ public class FlagRightInstance {
 
     /**
      * Method calculate the available internal storage in GB
+     *
      * @return available internal storage in GB
      */
     public double getFreeInternalStorage() {
-       return StorageFetcher.getInstance().getFreeInternalStorage();
+        return StorageFetcher.getInstance().getFreeInternalStorage();
     }
 
     /**
      * Method check if external SD card is attached with the device and calculate the size of the
      * external card
+     *
      * @param forFreeStorage if true, then method will return only the available size;
      *                       otherwise return the total size
      * @return size of the external storage in GB
      */
     public double getExternalSdCardSize(boolean forFreeStorage) {
-       return StorageFetcher.getInstance().getExternalSdCardSize(forFreeStorage);
+        return StorageFetcher.getInstance().getExternalSdCardSize(forFreeStorage);
+    }
+
+    /**
+     * Method fetch the modal name of a calling device
+     *
+     * @return return the modal name of a device
+     */
+    public String getModalName() {
+        return Build.MODEL;
+    }
+
+    /**
+     * Method fetch the manufacture name of a calling device
+     *
+     * @return return the manufacture name of a device
+     */
+    public String getManufactureName() {
+        return Build.MANUFACTURER;
+    }
+
+    /**
+     * Method fetch the current OS version of a device
+     *
+     * @return return the OS version of a device
+     */
+    public String getOSVersion() {
+        return Build.VERSION.RELEASE;
+    }
+
+    /**
+     * Method returns the language code of this Locale.
+     *
+     * @return The language code, or the empty string if none is defined.
+     */
+    public String getDeviceLocaleLanguageCode() {
+        return Locale.getDefault().getLanguage();
+    }
+
+    /**
+     * Returns the country/region code for this locale, which should either be the empty string,
+     * an uppercase ISO 3166 2-letter code, or a UN M.49 3-digit code.
+     *
+     * @return The country/region code, or the empty string if none is defined.
+     */
+    public String getDeviceLocaleCountry() {
+        return Locale.getDefault().getCountry();
+    }
+
+    /**
+     * Gets the ID of this time zone.
+     *
+     * @return the ID of the time zone
+     */
+    public String getDeviceTimeZone() {
+        return TimeZone.getDefault().getID();
+    }
+
+    /**
+     * Returns the total RAM size of a device
+     *
+     * @param context Application context
+     * @return the RAM size in GB
+     */
+    public double getRamSize(Context context) {
+        ActivityManager activityManager =
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+
+        double scale = Math.pow(10, 0);
+        double value = ((double) memoryInfo.totalMem) / (1024 * 1024 * 1024);
+        return Math.round(value * scale) / scale;
+    }
+
+    /**
+     * Check if the data roaming is enabled
+     *
+     * @param context Application context
+     * @return true if the data raoming is enabled
+     */
+    public boolean isDataRoamingEnabled(Context context) {
+
+        try {
+            // return true or false if data roaming is enabled or not
+            int isEnabled = Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DATA_ROAMING);
+            System.out.println("isEnabled: " + isEnabled);
+            return isEnabled == 1;
+        } catch (Settings.SettingNotFoundException e) {
+            // return null if no such settings exist (device with no radio data ?)
+            return false;
+        }
+    }
+
+    /**
+     * Check is the accessibility is enabled or not
+     *
+     * @param context Application context
+     * @return true if the accessibility is enabled
+     */
+    public boolean isAccessibilityEnabled(Context context) {
+        boolean enabled = false;
+        try {
+            enabled = Settings.Secure.getInt(context.getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED) == 1;
+        } catch (Settings.SettingNotFoundException ex) {
+            enabled = false;
+        }
+        return enabled;
+    }
+
+    /**
+     * Required permission
+     * <uses-permission android:name="android.permission.BLUETOOTH" android:required="false" />
+     * Method checks if bluetooth enabled
+     *
+     * @return object of {@link BluetoothResponseModal} which returns information about
+     * bluetooth is enabled or not along with the error message if device does not support bluetooth
+     */
+    public BluetoothResponseModal isBluetoothEnabled() {
+        BluetoothResponseModal bluetoothResponseModal = new BluetoothResponseModal();
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            bluetoothResponseModal.setEnable(false);
+            bluetoothResponseModal.setErrorMessage("Device does not support bluetooth");
+        } else if (!mBluetoothAdapter.isEnabled()) {
+            // Bluetooth is not enabled :)
+            bluetoothResponseModal.setEnable(false);
+        } else {
+            // Bluetooth is enabled
+            bluetoothResponseModal.setEnable(true);
+        }
+        return bluetoothResponseModal;
+    }
+
+    /**
+     * Gets the network operator name
+     *
+     * @param context Application context
+     * @return name of the network operator
+     */
+    public String getNetworkOperatorName(Context context) {
+        TelephonyManager telMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telMgr != null) {
+            return telMgr.getNetworkOperatorName();
+        } else {
+            System.err.println("Unable to get network operator name. TelephonyManager was null");
+            return "unknown";
+        }
+    }
+
+    public String getFingerprint() {
+        return Build.FINGERPRINT;
     }
 }

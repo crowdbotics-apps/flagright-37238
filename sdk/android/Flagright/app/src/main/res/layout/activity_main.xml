@@ -107,6 +107,78 @@
                 android:layout_height="wrap_content"
                 android:text= "External Storage"
                 />
+            <TextView
+                android:id="@+id/modal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Modal"
+                />
+            <TextView
+                android:id="@+id/manufacture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Modal"
+                />
+            <TextView
+                android:id="@+id/os"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "OS"
+                />
+            <TextView
+                android:id="@+id/languageCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Language"
+                />
+            <TextView
+                android:id="@+id/countryCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Country"
+                />
+            <TextView
+                android:id="@+id/timeZone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Country"
+                />
+            <TextView
+                android:id="@+id/ramSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Ram"
+                />
+            <TextView
+                android:id="@+id/roaming"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Roaming"
+                />
+            <TextView
+                android:id="@+id/accessibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Accessibility"
+                />
+            <TextView
+                android:id="@+id/bluetooth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Bluetooth"
+                />
+            <TextView
+                android:id="@+id/networkOperator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Network Operator"
+                />
+            <TextView
+                android:id="@+id/fingerPrint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Fingerprint"
+                />
         </LinearLayout>
     </ScrollView>
 
