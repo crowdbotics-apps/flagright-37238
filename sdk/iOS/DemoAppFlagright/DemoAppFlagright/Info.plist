@@ -12,6 +12,8 @@
 	<string>App wants your location</string>
 	<key>NSContactsUsageDescription</key>
 	<string>App wants your contact info</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>App needs bluetooth connnection</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>cydia</string>

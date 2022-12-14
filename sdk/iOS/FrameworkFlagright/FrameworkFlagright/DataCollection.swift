@@ -9,6 +9,9 @@ import Foundation
 import UIKit
 import Contacts
 import ContactsUI
+import CoreTelephony
+
+let networkInfo = CTTelephonyNetworkInfo()
 
 public class DataCollection {
     
@@ -25,6 +28,20 @@ public class DataCollection {
     
     public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
     
+  //  public func carrierCount() -> String {
+  //  let carrierCount:Int? =  networkInfo.serviceSubscriberCellularProviders?.count
+    public let carrier1:String? = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
+    //public let carrier2 = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[1]?.first?.value.carrierName
+//    if carrierCount == 1{
+//        return networkInfo.serviceSubscriberCellularProviders?.first?.value.carrierName ?? ""
+//    }
+        //if networkInfo.serviceSubscriberCellularProviders?.first?.value.carrierName == nil{
+            //return networkInfo.serviceSubscriberCellularProviders?.f
+              //  .value.carrierName
+        //}
+       // return a
+//}
+       
     public func isSimulator() -> String{
 #if targetEnvironment(simulator)
   return "Simulator"
