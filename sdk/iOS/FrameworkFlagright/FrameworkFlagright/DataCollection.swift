@@ -29,8 +29,6 @@ public class DataCollection{
     public let systemVersion = UIDevice.current.systemVersion
     public let maker = "Apple"
     public let modelName = UIDevice.modelName 
-    public var locationManager : CLLocationManager!
-
     public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
     
     public let carrier:String? = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
