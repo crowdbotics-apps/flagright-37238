@@ -8,43 +8,22 @@
 import UIKit
 import FrameworkFlagright
 import CoreLocation
-import CoreBluetooth
-import LocalAuthentication
 import SwiftUI
 
-class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralManagerDelegate {
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        switch central.state {
-        case .poweredOn:
-            print("Bluetooth is ON.")
-            break
-        case .poweredOff:
-            print("Bluetooth is Off.")
-            break
-        case .resetting:
-            break
-        case .unauthorized:
-            break
-        case .unsupported:
-            break
-        case .unknown:
-            break
-        default:
-            break
-        }
-    }
-    
+class ViewController: UIViewController, CLLocationManagerDelegate {
     
     var locationManager : CLLocationManager!
-    var manager:CBCentralManager!
-
+    
+    var bleManager: BLEManager!
         
     override func viewDidLoad() {
         super.viewDidLoad()
         let deviceData = DataCollection()
+        
+        bleManager = BLEManager()
 
-        manager = CBCentralManager()
-        manager.delegate = self
+       // manager = CBCentralManager()
+       // manager.delegate = self
         
         print("The device ID is \(deviceData.deviceID)")
         print("The device language is \(deviceData.language ?? "Error")")
