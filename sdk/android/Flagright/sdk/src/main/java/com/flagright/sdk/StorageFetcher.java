@@ -75,46 +75,52 @@ public class StorageFetcher {
         String external_storage_path = "";
         double size = 0;
 
-        if (storage.exists()) {
-            File[] files = storage.listFiles();
+        try {
 
-            for (File file : files) {
-                if (file.exists()) {
-                    try {
-                        if (Environment.isExternalStorageRemovable(file)) {
-                            // storage is removable
-                            external_storage_path = file.getAbsolutePath();
-                            break;
+            if (storage.exists()) {
+                File[] files = storage.listFiles();
+
+                for (File file : files) {
+                    if (file.exists()) {
+                        try {
+                            if (Environment.isExternalStorageRemovable(file)) {
+                                // storage is removable
+                                external_storage_path = file.getAbsolutePath();
+                                break;
+                            }
+                        } catch (Exception e) {
+                            Log.e("TAG", e.toString());
                         }
-                    } catch (Exception e) {
-                        Log.e("TAG", e.toString());
                     }
                 }
             }
-        }
 
-        if (!external_storage_path.isEmpty()) {
-            File external_storage = new File(external_storage_path);
-            if (external_storage.exists()) {
-                try {
-                    StatFs sdCardDir = new StatFs(external_storage.getPath());
-                    if (!forFreeStorage) {
-                        BigInteger rootDirCapacity = getDirTotalCapacity(sdCardDir);
-                        size = rootDirCapacity.doubleValue() / (1024 * 1024 * 1024);
-                    } else {
-                        long sdCardAvailableBlocks = sdCardDir.getAvailableBlocksLong();
-                        long sdCardBlockSize = sdCardDir.getBlockSizeLong();
-                        double sdCardFree = BigInteger.valueOf(sdCardAvailableBlocks).multiply(BigInteger.valueOf(sdCardBlockSize)).doubleValue();
-                        size = sdCardFree/(1024 * 1024 * 1024);
+            if (!external_storage_path.isEmpty()) {
+                File external_storage = new File(external_storage_path);
+                if (external_storage.exists()) {
+                    try {
+                        StatFs sdCardDir = new StatFs(external_storage.getPath());
+                        if (!forFreeStorage) {
+                            BigInteger rootDirCapacity = getDirTotalCapacity(sdCardDir);
+                            size = rootDirCapacity.doubleValue() / (1024 * 1024 * 1024);
+                        } else {
+                            long sdCardAvailableBlocks = sdCardDir.getAvailableBlocksLong();
+                            long sdCardBlockSize = sdCardDir.getBlockSizeLong();
+                            double sdCardFree = BigInteger.valueOf(sdCardAvailableBlocks).multiply(BigInteger.valueOf(sdCardBlockSize)).doubleValue();
+                            size = sdCardFree / (1024 * 1024 * 1024);
+                        }
+
+                    } catch (Exception ex) {
+                        size = 0;
                     }
-
-                } catch (Exception ex) {
-                    size = 0;
-                }
 //                size = totalSize(external_storage);
+                }
             }
+
+            return roundAvoid(size, 1);
+        }catch (Exception ex) {
+           return 0;
         }
-        return roundAvoid(size, 1);
     }
 
 
