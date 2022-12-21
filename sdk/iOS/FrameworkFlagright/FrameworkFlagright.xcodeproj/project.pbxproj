@@ -15,6 +15,7 @@
 		08E85B39293F620E00B35B10 /* DataCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85B38293F620E00B35B10 /* DataCollection.swift */; };
 		08E85B402940791B00B35B10 /* UIDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */; };
 		08F0BA9A294C9B0200B161EB /* BleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F0BA99294C9B0100B161EB /* BleHandler.swift */; };
+		08F0BA9C295047C800B161EB /* LocationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08F0BA9B295047C800B161EB /* LocationHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		08E85B38293F620E00B35B10 /* DataCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCollection.swift; sourceTree = "<group>"; };
 		08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDeviceExtension.swift; sourceTree = "<group>"; };
 		08F0BA99294C9B0100B161EB /* BleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleHandler.swift; sourceTree = "<group>"; };
+		08F0BA9B295047C800B161EB /* LocationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,8 +85,9 @@
 				08E85AE2293F5AB400B35B10 /* FrameworkFlagright.docc */,
 				08E85B38293F620E00B35B10 /* DataCollection.swift */,
 				08DA70692941B812003E19BB /* UIDeviceExtension+Jailbreak.swift */,
-				08F0BA99294C9B0100B161EB /* BleHandler.swift */,
 				08E85B3F2940791A00B35B10 /* UIDeviceExtension.swift */,
+				08F0BA99294C9B0100B161EB /* BleHandler.swift */,
+				08F0BA9B295047C800B161EB /* LocationHandler.swift */,
 			);
 			path = FrameworkFlagright;
 			sourceTree = "<group>";
@@ -209,6 +212,7 @@
 				08E85B402940791B00B35B10 /* UIDeviceExtension.swift in Sources */,
 				08F0BA9A294C9B0200B161EB /* BleHandler.swift in Sources */,
 				08DA706A2941B812003E19BB /* UIDeviceExtension+Jailbreak.swift in Sources */,
+				08F0BA9C295047C800B161EB /* LocationHandler.swift in Sources */,
 				08E85AE3293F5AB400B35B10 /* FrameworkFlagright.docc in Sources */,
 				08E85B39293F620E00B35B10 /* DataCollection.swift in Sources */,
 			);

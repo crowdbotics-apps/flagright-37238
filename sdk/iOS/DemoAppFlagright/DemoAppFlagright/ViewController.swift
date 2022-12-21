@@ -7,23 +7,21 @@
 
 import UIKit
 import FrameworkFlagright
-import CoreLocation
 import SwiftUI
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
-    
-    var locationManager : CLLocationManager!
-    
-    var bleManager: BLEManager!
+class ViewController: UIViewController {
         
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    var bleManager: BLEManager!
+    var locationManager: LocationHandler!
+        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         let deviceData = DataCollection()
         
         bleManager = BLEManager()
-
-       // manager = CBCentralManager()
-       // manager.delegate = self
+        
+        locationManager = LocationHandler()
+        locationManager.determineMyCurrentLocation()
         
         print("The device ID is \(deviceData.deviceID)")
         print("The device language is \(deviceData.language ?? "Error")")
@@ -49,50 +47,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         // Do any additional setup after loading the view.
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        determineMyCurrentLocation()
+    override func viewDidLoad() {
+        super.viewDidLoad()
     }
-    
-    func determineMyCurrentLocation() {
-           locationManager = CLLocationManager()
-           locationManager.delegate = self
-           locationManager.desiredAccuracy = kCLLocationAccuracyBest
-           locationManager.requestAlwaysAuthorization()
-
-           if CLLocationManager.locationServicesEnabled() {
-
-               locationManager.startUpdatingLocation()
-               //locationManager.startUpdatingHeading()
-           }
-       }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-           let userLocation:CLLocation = locations[0] as CLLocation
-
-           // Call stopUpdatingLocation() to stop listening for location updates,
-           // other wise this function will be called every time when user location changes.
-
-          manager.stopUpdatingLocation()
-
-           print("user latitude = \(userLocation.coordinate.latitude)")
-           print("user longitude = \(userLocation.coordinate.longitude)")
-
-          switch locationManager.authorizationStatus {
-             case .notDetermined, .restricted, .denied:
-                 print("No access")
-             case .authorizedAlways, .authorizedWhenInUse:
-                 print("Access")
-             @unknown default:
-                 break
-         }
-       }
-
-       func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
-       {
-           print("Error")
-       }
-
 
 }
-
