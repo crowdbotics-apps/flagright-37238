@@ -1,14 +1,11 @@
 package com.flagright.sdk;
 
-import static android.provider.Settings.System.getString;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
