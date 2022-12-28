@@ -132,6 +132,54 @@ export function getOSVersion() {
   return DeviceInfo.getSystemVersion();
 }
 
+export function getDeviceLocaleLanguageCode(): Promise<string> {
+  try {
+    return FlagrightSdk.getDeviceLocaleLanguageCode();
+  } catch (ex) {
+    return new Promise((resolve) => resolve('NA'));
+  }
+}
+
+export function getDeviceLocaleCountry(): Promise<string> {
+  try {
+    return FlagrightSdk.getDeviceLocaleCountry();
+  } catch (ex) {
+    return new Promise((resolve) => resolve('NA'));
+  }
+}
+
+export function getDeviceTimeZone(): Promise<string> {
+  try {
+    return FlagrightSdk.getDeviceTimeZone();
+  } catch (ex) {
+    return new Promise((resolve) => resolve('NA'));
+  }
+}
+
+/**
+ * Method gets the total RAM size
+ * @returns total RAM of a device in GB
+ */
+export function getRamSize() {
+  return roundAvoid(DeviceInfo.getTotalMemorySync() / (1024 * 1024 * 1024), 0);
+}
+
+export function isDataRoamingEnabled(): Promise<boolean> {
+  try {
+    return FlagrightSdk.isDataRoamingEnabled();
+  } catch (ex) {
+    return new Promise((resolve) => resolve(false));
+  }
+}
+
+export function isAccessibilityEnabled(): Promise<boolean> {
+  try {
+    return FlagrightSdk.isAccessibilityEnabled();
+  } catch (ex) {
+    return new Promise((resolve) => resolve(false));
+  }
+}
+
 function roundAvoid(value: number, places: number) {
   const scale = Math.pow(10, places);
   return Math.round(value * scale) / scale;
