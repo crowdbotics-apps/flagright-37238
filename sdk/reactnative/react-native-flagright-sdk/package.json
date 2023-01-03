@@ -71,6 +71,7 @@
     "react-native": "0.70.6",
     "react-native-builder-bob": "^0.20.3",
     "react-native-device-info": "^10.3.0",
+    "react-native-geolocation-service": "^5.3.1",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2"
   },
@@ -80,7 +81,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-device-info": "*"
+    "react-native-device-info": "*",
+    "react-native-geolocation-service": "*"
   },
   "engines": {
     "node": ">= 16.0.0"

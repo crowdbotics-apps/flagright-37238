@@ -304,6 +304,8 @@ PODS:
     - glog
   - react-native-flagright-sdk (0.1.0):
     - React-Core
+  - react-native-geolocation-service (5.3.1):
+    - React
   - React-perflogger (0.70.6)
   - React-RCTActionSheet (0.70.6):
     - React-Core/RCTActionSheetHeaders (= 0.70.6)
@@ -425,6 +427,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-flagright-sdk (from `../..`)
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -503,6 +506,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-flagright-sdk:
     :path: "../.."
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -568,6 +573,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 60769e5a0a6d4b32294a2456077f59d0266f9a8b
   React-logger: 1623c216abaa88974afce404dc8f479406bbc3a0
   react-native-flagright-sdk: dec7ac1d240ce74864971c0bdb53ff22d2d45647
+  react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   React-perflogger: 8c79399b0500a30ee8152d0f9f11beae7fc36595
   React-RCTActionSheet: 7316773acabb374642b926c19aef1c115df5c466
   React-RCTAnimation: 5341e288375451297057391227f691d9b2326c3d

@@ -1,5 +1,8 @@
 import { NativeModules, Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import Geolocation from 'react-native-geolocation-service';
+import type { BluetoothResponseType } from './types/BluetoothResponseModalType';
+import type { GeolocationType } from './types/GeolocationType';
 
 const LINKING_ERROR =
   `The package 'react-native-flagright-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -177,6 +180,115 @@ export function isAccessibilityEnabled(): Promise<boolean> {
     return FlagrightSdk.isAccessibilityEnabled();
   } catch (ex) {
     return new Promise((resolve) => resolve(false));
+  }
+}
+
+/**
+ * <uses-permission android:name="android.permission.BLUETOOTH" android:required="false" />
+ * Method checks if bluetooth enabled
+ * @returns Promise with true or false. True if bluetooth is enabled
+ */
+export function isBluetoothEnabled(): Promise<BluetoothResponseType> {
+  try {
+    return FlagrightSdk.isBluetoothEnabled();
+  } catch (ex) {
+    return new Promise((resolve) =>
+      resolve({ enable: false, errorMessage: 'NA' })
+    );
+  }
+}
+
+export function getNetworkOperatorName() {
+  return DeviceInfo.getCarrierSync();
+}
+
+export function getCurrentLocation(
+  options: Geolocation.GeoOptions = {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 10000,
+  }
+): Promise<GeolocationType> {
+  return new Promise((resolve, reject) => {
+    Geolocation.getCurrentPosition(
+      (position) => resolve({ success: true, position }),
+      (error) => resolve({ success: false, error }),
+      options
+    );
+  });
+}
+
+/**
+ * Method returns the iP address
+ *
+ * @param useIPV4 true for iPV4 address; otherwise get iPV6 address
+ * @returns ipAddress (either iPV4 or iPV6)
+ */
+export function getIPAddress(useIPV4: boolean): Promise<string> {
+  try {
+    return FlagrightSdk.getIPAddress(useIPV4);
+  } catch (ex) {
+    return new Promise((resolve) => resolve('NA'));
+  }
+}
+
+/**
+ * For Android: Permission required ACCESS_NETWORK_STATE
+ * Methods checks if the device is connected to VPN or not
+ *
+ * @returns true if the device is connected to VPN
+ */
+
+export function isDeviceConnectedToVPN(): Promise<boolean> {
+  try {
+    return FlagrightSdk.isDeviceConnectedToVPN();
+  } catch (ex) {
+    return new Promise((resolve) => resolve(false));
+  }
+}
+
+/**
+ * Method detects if the device is jailbreak (or rooted)
+ *
+ * @returns true if the device is jailbreak or rooted
+ */
+export function isDeviceRooted(): Promise<boolean> {
+  try {
+    return FlagrightSdk.isDeviceRooted();
+  } catch (ex) {
+    return new Promise((resolve) => resolve(false));
+  }
+}
+
+/**
+ * Requires READ_CONTACTS permission
+ * Method fetch total number contacts
+ *
+ * @return total number of contacts
+ */
+export function fetchContactsCount(): Promise<number> {
+  try {
+    return FlagrightSdk.fetchContactsCount();
+  } catch (ex) {
+    return new Promise((resolve) => resolve(0));
+  }
+}
+
+/**
+ *  Method check if external SD card is attached with the device and calculate the size of the
+ * external card
+ *
+ * @param forFreeStorage if true, then method will return only the available size;
+ *                       otherwise return the total size
+ * @return size of the external storage in GB
+ */
+export function getExternalSdCardSize(
+  forFreeStorage: boolean
+): Promise<number> {
+  try {
+    return FlagrightSdk.getExternalSdCardSize(forFreeStorage);
+  } catch (ex) {
+    return new Promise((resolve) => resolve(0));
   }
 }
 
