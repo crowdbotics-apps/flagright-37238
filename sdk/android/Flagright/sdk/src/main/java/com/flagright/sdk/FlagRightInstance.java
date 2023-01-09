@@ -418,6 +418,7 @@ public class FlagRightInstance {
     }
 
     public String getFingerprint() {
+        Log.i("Contacts", Build.FINGERPRINT);
         return Build.FINGERPRINT;
     }
 }
