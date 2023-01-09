@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/emulator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+
+            <TextView
+                android:id="@+id/addressIP4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+            <TextView
+                android:id="@+id/addressIP6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+            <TextView
+                android:id="@+id/vpn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+            <TextView
+                android:id="@+id/biometric"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+            <TextView
+                android:id="@+id/rooted"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Is Real Device"
+                />
+            <TextView
+                android:id="@+id/contactsCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Total Contacts"
+                />
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Location"
+                />
+            <TextView
+                android:id="@+id/locationEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Location Enabled"
+                />
+            <TextView
+                android:id="@+id/batteryLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Battery Level"
+                />
+            <TextView
+                android:id="@+id/internalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Internal Storage"
+                />
+            <TextView
+                android:id="@+id/freeInternal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Internal Storage"
+                />
+            <TextView
+                android:id="@+id/totalExternalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "External Storage"
+                />
+            <TextView
+                android:id="@+id/freeExternalStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "External Storage"
+                />
+            <TextView
+                android:id="@+id/modal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Modal"
+                />
+            <TextView
+                android:id="@+id/manufacture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Modal"
+                />
+            <TextView
+                android:id="@+id/os"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "OS"
+                />
+            <TextView
+                android:id="@+id/languageCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Language"
+                />
+            <TextView
+                android:id="@+id/countryCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Country"
+                />
+            <TextView
+                android:id="@+id/timeZone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Country"
+                />
+            <TextView
+                android:id="@+id/ramSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Ram"
+                />
+            <TextView
+                android:id="@+id/roaming"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Roaming"
+                />
+            <TextView
+                android:id="@+id/accessibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Accessibility"
+                />
+            <TextView
+                android:id="@+id/bluetooth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Bluetooth"
+                />
+            <TextView
+                android:id="@+id/networkOperator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Network Operator"
+                />
+            <TextView
+                android:id="@+id/fingerPrint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text= "Fingerprint"
+                />
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
