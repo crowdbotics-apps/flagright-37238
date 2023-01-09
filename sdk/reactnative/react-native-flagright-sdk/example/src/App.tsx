@@ -70,11 +70,13 @@ export default function App() {
     isDataRoamingEnabled().then((enabled) => setRoamingEnabled(enabled));
     isAccessibilityEnabled().then((enabled) => setAccessibility(enabled));
     isBluetoothEnabled().then((bluetoothObj) => {
-      console.log('bluetoothObj', bluetoothObj);
+      // console.log('bluetoothObj', bluetoothObj);
       setBluetoothEnabled(bluetoothObj);
     });
     if (Platform.OS === 'android') {
       requestLocationPermission();
+    } else {
+      fetchContactsCount().then((count) => setTotalContacts(count));
     }
     getIPAddress(true).then((address) => setIPv4(address));
     getIPAddress(false).then((address) => setIPv6(address));

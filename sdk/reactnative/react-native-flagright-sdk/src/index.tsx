@@ -264,12 +264,16 @@ export function isDeviceRooted(): Promise<boolean> {
  * Requires READ_CONTACTS permission
  * Method fetch total number contacts
  *
+ * For iOS: required to add NSContactsUsageDescription key with the valid reason at Info.plist
+ *
  * @return total number of contacts
  */
 export function fetchContactsCount(): Promise<number> {
+  console.log('Calling fetchContactsCount', Platform.OS);
   try {
     return FlagrightSdk.fetchContactsCount();
   } catch (ex) {
+    console.log('Error', ex);
     return new Promise((resolve) => resolve(0));
   }
 }
