@@ -302,6 +302,8 @@ PODS:
   - React-jsinspector (0.70.6)
   - React-logger (0.70.6):
     - glog
+  - react-native-bluetooth-status (1.5.1):
+    - React
   - react-native-flagright-sdk (0.1.0):
     - React-Core
   - react-native-geolocation-service (5.3.1):
@@ -426,6 +428,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-bluetooth-status (from `../node_modules/react-native-bluetooth-status`)
   - react-native-flagright-sdk (from `../..`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -504,6 +507,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-bluetooth-status:
+    :path: "../node_modules/react-native-bluetooth-status"
   react-native-flagright-sdk:
     :path: "../.."
   react-native-geolocation-service:
@@ -572,6 +577,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: b4a65947391c658450151275aa406f2b8263178f
   React-jsinspector: 60769e5a0a6d4b32294a2456077f59d0266f9a8b
   React-logger: 1623c216abaa88974afce404dc8f479406bbc3a0
+  react-native-bluetooth-status: 306a9e5311c377813ea68066dd81b66165b3026f
   react-native-flagright-sdk: dec7ac1d240ce74864971c0bdb53ff22d2d45647
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   React-perflogger: 8c79399b0500a30ee8152d0f9f11beae7fc36595

@@ -30,6 +30,14 @@ RCT_EXTERN_METHOD(getDeviceTimeZone:
  (RCTPromiseResolveBlock)resolve
   rejecter:(RCTPromiseRejectBlock)reject)
 
+  RCT_EXTERN_METHOD(getIPAddress:
+ (RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject)
+
+  RCT_EXTERN_METHOD(isDeviceRooted:
+ (RCTPromiseResolveBlock)resolve
+  rejecter:(RCTPromiseRejectBlock)reject)
+
 
 + (BOOL)requiresMainQueueSetup
 {

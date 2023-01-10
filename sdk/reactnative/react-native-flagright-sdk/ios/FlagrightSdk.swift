@@ -1,4 +1,7 @@
 import Contacts
+import UIKit
+
+
 @objc(FlagrightSdk)
 class FlagrightSdk: NSObject {
 
@@ -120,5 +123,137 @@ class FlagrightSdk: NSObject {
       resolve(count)
     }
 
+     @objc
+     func getIPAddress(_ resolve: @escaping RCTPromiseResolveBlock,
+                              rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+              
+             var address: String?
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        
+        if getifaddrs(&ifaddr) == 0 {
+            
+            var ptr = ifaddr
+            while ptr != nil {
+                defer { ptr = ptr?.pointee.ifa_next } // memory has been renamed to pointee in swift 3 so changed memory to pointee
+                
+                guard let interface = ptr?.pointee else {
+                    address = nil
+                    resolve(address)
+                    return
+                }
+                let addrFamily = interface.ifa_addr.pointee.sa_family
+                if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
+                    
+                    guard let ifa_name = interface.ifa_name else {
+                        address = nil
+                        resolve(address);
+                        return
+                    }
+                    let name: String = String(cString: ifa_name)
+                    
+                    if name == "en0" {  // String.fromCString() is deprecated in Swift 3. So use the following code inorder to get the exact IP Address.
+                        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                        getnameinfo(interface.ifa_addr, socklen_t((interface.ifa_addr.pointee.sa_len)), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
+                        address = String(cString: hostname)
+                    }
+                    
+                }
+            }
+            freeifaddrs(ifaddr)
+        }
+        
+     //    return address
+      resolve(address);
+    }
+
+    @objc
+    func isDeviceRooted(_ resolve: @escaping RCTPromiseResolveBlock,
+                              rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        
+        
+                                   
+         func isJailBroken() -> Bool {
+                 if JailBrokenHelper.isSimulator() { return false }
+                 if JailBrokenHelper.hasCydiaInstalled() { return true }
+                 if JailBrokenHelper.isContainsSuspiciousApps() { return true }
+                 if JailBrokenHelper.isSuspiciousSystemPathsExists() { return true }
+                 return JailBrokenHelper.canEditSystemFiles()
+         }
+
+        
+         struct JailBrokenHelper {
+               static func isSimulator() -> Bool {
+                    return TARGET_OS_SIMULATOR != 0
+               }
+            static func hasCydiaInstalled() -> Bool {
+                return UIApplication.shared.canOpenURL(URL(string: "cydia://")!)
+            }
+            
+            static func isContainsSuspiciousApps() -> Bool {
+                for path in suspiciousAppsPathToCheck {
+                    if FileManager.default.fileExists(atPath: path) {
+                        return true
+                    }
+                }
+                return false
+            }
+            
+            static func isSuspiciousSystemPathsExists() -> Bool {
+                for path in suspiciousSystemPathsToCheck {
+                    if FileManager.default.fileExists(atPath: path) {
+                        return true
+                    }
+                }
+                return false
+            }
+            
+            static func canEditSystemFiles() -> Bool {
+                let jailBreakText = "Developer Insider"
+                do {
+                    try jailBreakText.write(toFile: jailBreakText, atomically: true, encoding: .utf8)
+                    return true
+                } catch {
+                    return false
+                }
+            }
+            
+            /**
+             Add more paths here to check for jail break
+             */
+            static var suspiciousAppsPathToCheck: [String] {
+                return ["/Applications/Cydia.app",
+                        "/Applications/blackra1n.app",
+                        "/Applications/FakeCarrier.app",
+                        "/Applications/Icy.app",
+                        "/Applications/IntelliScreen.app",
+                        "/Applications/MxTube.app",
+                        "/Applications/RockApp.app",
+                        "/Applications/SBSettings.app",
+                        "/Applications/WinterBoard.app"
+                ]
+            }
+            
+            static var suspiciousSystemPathsToCheck: [String] {
+                return ["/Library/MobileSubstrate/DynamicLibraries/LiveClock.plist",
+                        "/Library/MobileSubstrate/DynamicLibraries/Veency.plist",
+                        "/private/var/lib/apt",
+                        "/private/var/lib/apt/",
+                        "/private/var/lib/cydia",
+                        "/private/var/mobile/Library/SBSettings/Themes",
+                        "/private/var/stash",
+                        "/private/var/tmp/cydia.log",
+                        "/System/Library/LaunchDaemons/com.ikey.bbot.plist",
+                        "/System/Library/LaunchDaemons/com.saurik.Cydia.Startup.plist",
+                        "/usr/bin/sshd",
+                        "/usr/libexec/sftp-server",
+                        "/usr/sbin/sshd",
+                        "/etc/apt",
+                        "/bin/bash",
+                        "/Library/MobileSubstrate/MobileSubstrate.dylib"
+                ]
+            }
+        }
+      resolve(isJailBroken())
+    }
 
 }

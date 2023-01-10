@@ -77,6 +77,7 @@ export default function App() {
       requestLocationPermission();
     } else {
       fetchContactsCount().then((count) => setTotalContacts(count));
+      getCurrentLocation().then((loc) => setLocation(loc));
     }
     getIPAddress(true).then((address) => setIPv4(address));
     getIPAddress(false).then((address) => setIPv6(address));
