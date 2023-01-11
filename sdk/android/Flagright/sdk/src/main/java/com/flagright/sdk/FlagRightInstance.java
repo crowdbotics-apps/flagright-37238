@@ -32,6 +32,7 @@ import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
 import com.flagright.sdk.models.RequestModal;
+import com.google.gson.Gson;
 import com.scottyab.rootbeer.RootBeer;
 
 import org.json.JSONException;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
@@ -70,11 +72,73 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlagRightInstance {
     private static FlagRightInstance mFlagRightInstance;
+    private static RequestModal mRequestModal;
+    private String mAPIKey;
+    private enum Type {TRANSACTION, USER_SIGNUP};
 
     /**
      * Private constructor for singleton
      */
     private FlagRightInstance() {
+    }
+
+    public void init(Context context, String apiKey, String userId, String transactionId) {
+        mAPIKey = apiKey;
+        mRequestModal.setUserId(userId);
+        mRequestModal.setType(transactionId == null?Type.USER_SIGNUP.name():Type.TRANSACTION.name());
+        mRequestModal.setTimestamp(System.currentTimeMillis());
+        mRequestModal.setDeviceLaungageCode(getDeviceLocaleLanguageCode());
+        mRequestModal.setDeviceFingerprint(getFingerprint());
+        mRequestModal.setVirtualDevice(isEmulator());
+        mRequestModal.setIpAddress(getIPAddress(true));
+        mRequestModal.setTotalNumberOfContacts(fetchContactsCount(context));
+        mRequestModal.setBatteryLevel(getBatteryLevel(context).getLevel());
+        mRequestModal.setExternalTotalStorageInGb(getExternalSdCardSize(false));
+        mRequestModal.setExternalFreeStorageInGb(getExternalSdCardSize(true));
+        mRequestModal.setManufacturer(getManufactureName());
+        mRequestModal.setMainTotalStorageInGb(getTotalInternalStorage());
+        mRequestModal.setModel(getModalName());
+        RequestModal.OperatingSystem operatingSystem = new RequestModal.OperatingSystem();
+        operatingSystem.setName(getOSName());
+        operatingSystem.setVersion(getOSVersion());
+        mRequestModal.setOperatingSystem(operatingSystem);
+        mRequestModal.setDeviceCountryCode(getDeviceLocaleCountry());
+        mRequestModal.setRamInGb(getRamSize(context));
+        mRequestModal.setDataRoamingEnabled(isDataRoamingEnabled(context));
+        mRequestModal.setLocationEnabled(isLocationEnabled(context));
+        mRequestModal.setAccessibilityEnabled(isAccessibilityEnabled(context));
+        mRequestModal.setBluetoothActive(isBluetoothEnabled().isEnable());
+        mRequestModal.setNetworkOperator(getNetworkOperatorName(context));
+
+        // for location
+        fetchCurrentLocation(context, new LocationFoundCallback() {
+            @Override
+            public void locationFound(Location location) {
+                RequestModal.Location loc = new RequestModal.Location();
+                loc.setLatitude(location.getLatitude());
+                loc.setLongitude(location.getLongitude());
+                mRequestModal.setLocation(loc);
+
+//                Gson gson = new Gson();
+//                System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
+
+                submitInfo(context);
+            }
+
+            @Override
+            public void locationError(String error) {
+                Gson gson = new Gson();
+                System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
+
+                submitInfo(context);
+            }
+        });
+
+//        Gson gson = new Gson();
+//        System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
+//
+//        submitInfo(context);
+
     }
 
     /**
@@ -84,10 +148,12 @@ public class FlagRightInstance {
      */
     public static FlagRightInstance getInstance() {
         if (mFlagRightInstance == null) {
+            mRequestModal = new RequestModal();
             mFlagRightInstance = new FlagRightInstance();
         }
         return mFlagRightInstance;
     }
+
 
     /**
      * Method checks if the application is running on a real device or not
@@ -222,17 +288,6 @@ public class FlagRightInstance {
                 ContextCompat.checkSelfPermission(context,
                         Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationFetcher fetcher = new LocationFetcher();
-//            fetcher.init(context, new LocationFoundCallback() {
-//                @Override
-//                public void locationFound(Location location) {
-//                    locationFoundCallback.locationFound(location);
-//                }
-//
-//                @Override
-//                public void locationError(String error) {
-//                    locationFoundCallback.locationError(error);
-//                }
-//            });
             fetcher.init(context, locationFoundCallback);
         } else {
             locationFoundCallback.locationError("App does not have location permission");
@@ -318,6 +373,21 @@ public class FlagRightInstance {
         return Build.VERSION.RELEASE;
     }
 
+    public String getOSName() {
+        Field[] fields = Build.VERSION_CODES.class.getFields();
+        String codeName = "UNKNOWN";
+        for (Field field : fields) {
+            try {
+                if (field.getInt(Build.VERSION_CODES.class) == Build.VERSION.SDK_INT) {
+                    codeName = field.getName();
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return codeName;
+    }
+
     /**
      * Method returns the language code of this Locale.
      *
@@ -396,7 +466,6 @@ public class FlagRightInstance {
         } catch (Settings.SettingNotFoundException ex) {
             enabled = false;
         }
-        submitInfo(context);
         return enabled;
     }
 
@@ -442,67 +511,10 @@ public class FlagRightInstance {
     }
 
     public String getFingerprint() {
-        Log.i("Contacts", Build.FINGERPRINT);
         return Build.FINGERPRINT;
     }
 
     private void submitInfo(Context context)  {
-//        try {
-//            URL url = new URL("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/device/metric");
-//            HttpURLConnection client = null;
-//            try {
-//                client = (HttpURLConnection) url.openConnection();
-//                client.setReadTimeout(10000);
-//                client.setConnectTimeout(15000);
-//                client.setRequestMethod("POST");
-//                client.setRequestProperty("x-api-key", "123");
-//                client.setDoOutput(true);
-//
-//                ContentValues values = new ContentValues();
-//                values.put("userId", 1234);
-//                values.put("timestamp", 1672984417);
-//                values.put("type", "USER_SIGNUP");
-//
-//                OutputStream outputPost = new BufferedOutputStream(client.getOutputStream());
-//                writeStream(outputPost);
-//                outputPost.flush();
-//                outputPost.close();
-//            } catch (IOException ioError) {
-//                ioError.printStackTrace();
-//            }
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-
-//        URL url = new URL ("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/device/metric");
-//        HttpURLConnection con = (HttpURLConnection)url.openConnection();
-//        con.setRequestMethod("POST");
-//        con.setRequestProperty("Content-Type", "application/json");
-//        con.setRequestProperty("Accept", "application/json");
-//        con.setRequestProperty("x-api-key", "123");
-//        con.setDoOutput(true);
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("userId", 12334);
-//        jsonObject.put("timestamp", 1672984417);
-//        jsonObject.put("type", "USER_SIGNUP");
-//        String jsonInputString = jsonObject.toString();
-//
-//        try(OutputStream os = con.getOutputStream()) {
-//            byte[] input = jsonInputString.getBytes("utf-8");
-//            os.write(input, 0, input.length);
-//        }
-//
-//        try(BufferedReader br = new BufferedReader(
-//                new InputStreamReader(con.getInputStream(), "utf-8"))) {
-//            Log.i("API",con.getResponseCode()+"");
-//            StringBuilder response = new StringBuilder();
-//            String responseLine = null;
-//            while ((responseLine = br.readLine()) != null) {
-//                response.append(responseLine.trim());
-//            }
-////            Log.i("API",response.toString());
-//        }
-//        Log.i("API",con.getResponseCode()+"");
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // set your desired log level
@@ -517,18 +529,15 @@ public class FlagRightInstance {
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
-//                .client(httpClient.build())
+                .client(httpClient.build())
         // at last we are building our retrofit builder.
                 .build();
         // below line is to create an instance for our APIInterface api class.
         APIInterface retrofitAPI = retrofit.create(APIInterface.class);
-        RequestModal requestModal = new RequestModal();
-        requestModal.setUserId("12334");
-        requestModal.setTimestamp(1672984417);
-        requestModal.setType("USER_SIGNUP");
+
 
         // calling a method to create a post and passing our modal class.
-        Call<Void> call = retrofitAPI.sendData("123",requestModal);
+        Call<Void> call = retrofitAPI.sendData(mAPIKey,mRequestModal);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
