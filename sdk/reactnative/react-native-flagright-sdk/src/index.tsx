@@ -1,6 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Geolocation from 'react-native-geolocation-service';
+import { BluetoothStatus } from 'react-native-bluetooth-status';
 import type { BluetoothResponseType } from './types/BluetoothResponseModalType';
 import type { GeolocationType } from './types/GeolocationType';
 
@@ -183,6 +184,10 @@ export function isAccessibilityEnabled(): Promise<boolean> {
   }
 }
 
+async function getBluetoothStatus() {
+  const isEnabled = await BluetoothStatus.state();
+  return isEnabled;
+}
 /**
  * <uses-permission android:name="android.permission.BLUETOOTH" android:required="false" />
  * Method checks if bluetooth enabled
@@ -190,7 +195,15 @@ export function isAccessibilityEnabled(): Promise<boolean> {
  */
 export function isBluetoothEnabled(): Promise<BluetoothResponseType> {
   try {
-    return FlagrightSdk.isBluetoothEnabled();
+    if (Platform.OS === 'ios') {
+      return new Promise((resolve) => {
+        getBluetoothStatus()
+          .then((btStatus) => {
+            resolve({ enable: btStatus ?? false } as BluetoothResponseType);
+          })
+          .catch((er) => resolve({ enable: false } as BluetoothResponseType));
+      });
+    } else return FlagrightSdk.isBluetoothEnabled();
   } catch (ex) {
     return new Promise((resolve) =>
       resolve({ enable: false, errorMessage: 'NA' })
@@ -210,11 +223,28 @@ export function getCurrentLocation(
   }
 ): Promise<GeolocationType> {
   return new Promise((resolve, reject) => {
-    Geolocation.getCurrentPosition(
-      (position) => resolve({ success: true, position }),
-      (error) => resolve({ success: false, error }),
-      options
-    );
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization('whenInUse')
+        .then((value) => {
+          if (value === 'granted') {
+            Geolocation.getCurrentPosition(
+              (position) => resolve({ success: true, position }),
+              (error) => resolve({ success: false, error }),
+              options
+            );
+          } else {
+            resolve({ success: false });
+          }
+        })
+        .catch((ex) => {
+          resolve({ success: false });
+        });
+    } else
+      Geolocation.getCurrentPosition(
+        (position) => resolve({ success: true, position }),
+        (error) => resolve({ success: false, error }),
+        options
+      );
   });
 }
 
@@ -226,7 +256,8 @@ export function getCurrentLocation(
  */
 export function getIPAddress(useIPV4: boolean): Promise<string> {
   try {
-    return FlagrightSdk.getIPAddress(useIPV4);
+    if (Platform.OS === 'ios') return FlagrightSdk.getIPAddress();
+    else return FlagrightSdk.getIPAddress(useIPV4);
   } catch (ex) {
     return new Promise((resolve) => resolve('NA'));
   }

@@ -24,6 +24,10 @@
 	<string>1</string>
 	<key>NSContactsUsageDescription</key>
     <string>App wants your contact info</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>App wants your location info</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>App wants your location info</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

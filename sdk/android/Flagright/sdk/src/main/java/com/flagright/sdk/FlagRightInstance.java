@@ -5,7 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.biometrics.BiometricManager;
@@ -25,18 +27,31 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.flagright.sdk.interfaces.APIInterface;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
+import com.flagright.sdk.models.RequestModal;
 import com.scottyab.rootbeer.RootBeer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -44,6 +59,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlagRightInstance {
     private static FlagRightInstance mFlagRightInstance;
@@ -373,6 +396,7 @@ public class FlagRightInstance {
         } catch (Settings.SettingNotFoundException ex) {
             enabled = false;
         }
+        submitInfo(context);
         return enabled;
     }
 
@@ -420,5 +444,103 @@ public class FlagRightInstance {
     public String getFingerprint() {
         Log.i("Contacts", Build.FINGERPRINT);
         return Build.FINGERPRINT;
+    }
+
+    private void submitInfo(Context context)  {
+//        try {
+//            URL url = new URL("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/device/metric");
+//            HttpURLConnection client = null;
+//            try {
+//                client = (HttpURLConnection) url.openConnection();
+//                client.setReadTimeout(10000);
+//                client.setConnectTimeout(15000);
+//                client.setRequestMethod("POST");
+//                client.setRequestProperty("x-api-key", "123");
+//                client.setDoOutput(true);
+//
+//                ContentValues values = new ContentValues();
+//                values.put("userId", 1234);
+//                values.put("timestamp", 1672984417);
+//                values.put("type", "USER_SIGNUP");
+//
+//                OutputStream outputPost = new BufferedOutputStream(client.getOutputStream());
+//                writeStream(outputPost);
+//                outputPost.flush();
+//                outputPost.close();
+//            } catch (IOException ioError) {
+//                ioError.printStackTrace();
+//            }
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+
+//        URL url = new URL ("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/device/metric");
+//        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+//        con.setRequestMethod("POST");
+//        con.setRequestProperty("Content-Type", "application/json");
+//        con.setRequestProperty("Accept", "application/json");
+//        con.setRequestProperty("x-api-key", "123");
+//        con.setDoOutput(true);
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("userId", 12334);
+//        jsonObject.put("timestamp", 1672984417);
+//        jsonObject.put("type", "USER_SIGNUP");
+//        String jsonInputString = jsonObject.toString();
+//
+//        try(OutputStream os = con.getOutputStream()) {
+//            byte[] input = jsonInputString.getBytes("utf-8");
+//            os.write(input, 0, input.length);
+//        }
+//
+//        try(BufferedReader br = new BufferedReader(
+//                new InputStreamReader(con.getInputStream(), "utf-8"))) {
+//            Log.i("API",con.getResponseCode()+"");
+//            StringBuilder response = new StringBuilder();
+//            String responseLine = null;
+//            while ((responseLine = br.readLine()) != null) {
+//                response.append(responseLine.trim());
+//            }
+////            Log.i("API",response.toString());
+//        }
+//        Log.i("API",con.getResponseCode()+"");
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        // set your desired log level
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+
+        // on below line we are creating a retrofit
+        // builder and passing our base url
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/")
+                // as we are sending data in json format so
+                // we have to add Gson converter factory
+                .addConverterFactory(GsonConverterFactory.create())
+//                .client(httpClient.build())
+        // at last we are building our retrofit builder.
+                .build();
+        // below line is to create an instance for our APIInterface api class.
+        APIInterface retrofitAPI = retrofit.create(APIInterface.class);
+        RequestModal requestModal = new RequestModal();
+        requestModal.setUserId("12334");
+        requestModal.setTimestamp(1672984417);
+        requestModal.setType("USER_SIGNUP");
+
+        // calling a method to create a post and passing our modal class.
+        Call<Void> call = retrofitAPI.sendData("123",requestModal);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Log.i("API", response.code()+" "+call.request().body()+" "+call.request().headers().toString());
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API", t.getMessage()+" "+call.request().url());
+
+            }
+        });
     }
 }
