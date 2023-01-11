@@ -148,6 +148,8 @@ public class MainActivity extends AppCompatActivity {
                 .append("Fingerprint: ")
                 .append(flagRightInstance.getFingerprint()));
         System.out.println("FingerPrint: "+flagRightInstance.getFingerprint());
+
+        FlagRightInstance.getInstance().init(this,"123","1234", null);
     }
 
     private void requestAppPermissions() {
