@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.flagright.sdk.FlagRightInstance;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
+import com.flagright.sdk.interfaces.ResponseCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,7 +150,17 @@ public class MainActivity extends AppCompatActivity {
                 .append(flagRightInstance.getFingerprint()));
         System.out.println("FingerPrint: "+flagRightInstance.getFingerprint());
 
-        FlagRightInstance.getInstance().init(this,"123","1234", null);
+        FlagRightInstance.getInstance().init(this, "123", "1234", null, new ResponseCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(MainActivity.this, "Data uploaded successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void requestAppPermissions() {
