@@ -6,9 +6,9 @@ import {
   Text,
   Platform,
   PermissionsAndroid,
+  SafeAreaView,
 } from 'react-native';
 import {
-  multiply,
   getDeviceId,
   isEmulator,
   isLocationEnabled,
@@ -33,11 +33,13 @@ import {
   isDeviceRooted,
   fetchContactsCount,
   getExternalSdCardSize,
+  init,
 } from 'react-native-flagright-sdk';
 import type { BluetoothResponseType } from 'src/types/BluetoothResponseModalType';
 import type { GeolocationType } from 'src/types/GeolocationType';
 
 export default function App() {
+  const [deviceId, setDeviceId] = React.useState<string>();
   const [languageCode, setLanguageCode] = React.useState<string>();
   const [countryCode, setCountryCode] = React.useState<string>();
   const [timeZone, setTimeZone] = React.useState<string>();
@@ -64,6 +66,13 @@ export default function App() {
   // const [fingerPrint, setFingerPrint] = React.useState<string | undefined>();
 
   React.useEffect(() => {
+    init('123', '1234')
+      .then(() => {
+        console.log('Data submitted successfully');
+      })
+      .catch((error) => console.log('Error', error));
+
+    getDeviceId().then((id) => setDeviceId(id));
     getDeviceLocaleLanguageCode().then((code) => setLanguageCode(code));
     getDeviceLocaleCountry().then((country) => setCountryCode(country));
     getDeviceTimeZone().then((timeZone) => setTimeZone(timeZone));
@@ -144,59 +153,61 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text>UnqiueId: {getDeviceId()}</Text>
-      <Text>isEmulator: {isEmulator() + ''}</Text>
-      <Text>IsLocationServciesEnabled: {isLocationEnabled() + ''}</Text>
-      <Text>BioMetricEnabled: {isDeviceSecure() + ''}</Text>
-      <Text>Battery Level: {batteryLevel}</Text>
-      <Text>Internal storage: {getTotalInternalStorage() + ' GB'}</Text>
-      <Text>
-        Internal storage Free: {getAvailableInternalStorage() + ' GB'}
-      </Text>
-      <Text>Modal: {getModalName()}</Text>
-      <Text>Manufacture: {getManufactureName()}</Text>
-      <Text>OS Version: {getOSVersion()}</Text>
-      <Text>Language Code: {languageCode}</Text>
-      <Text>Country Code: {countryCode}</Text>
-      <Text>TimeZone: {timeZone}</Text>
-      <Text>RAM: {getRamSize() + ' GB'}</Text>
-      <Text>Roaming Enabled: {roamingEnabled + ''}</Text>
-      <Text>Accessibility Enabled: {accessibility + ''}</Text>
-      <Text>Bluetooth Enabled: {bluetoothEnabled?.enable + ''}</Text>
-      <Text>Network Operator: {getNetworkOperatorName()}</Text>
-      {location?.success ? (
+    <SafeAreaView style={styles.container}>
+      <View>
+        <Text>isEmulator: {isEmulator() + ''}</Text>
+        <Text>IsLocationServciesEnabled: {isLocationEnabled() + ''}</Text>
+        <Text>BioMetricEnabled: {isDeviceSecure() + ''}</Text>
+        <Text>Battery Level: {batteryLevel}</Text>
+        <Text>Internal storage: {getTotalInternalStorage() + ' GB'}</Text>
         <Text>
-          Location:{' '}
-          {location?.position?.coords?.latitude +
-            ', ' +
-            location?.position?.coords?.longitude}
+          Internal storage Free: {getAvailableInternalStorage() + ' GB'}
         </Text>
-      ) : (
-        <Text>Location: NA</Text>
-      )}
-      <Text>iPV4: {ipv4}</Text>
-      <Text>iPV6: {ipv6}</Text>
-      <Text>VPN Connected: {isVpnConnected + ''}</Text>
-      <Text>Rooted: {isDeviceRootedFlag + ''}</Text>
-      <Text>Total Contacts: {totalContacts + ''}</Text>
-      {externalStorage?.total ? (
-        <>
-          <Text>{`Total External Storage: ${externalStorage?.total} + GB`}</Text>
-          <Text>Free External Storage: {externalStorage?.free + ' GB'}</Text>
-        </>
-      ) : (
-        <Text>Total External Storage: NA</Text>
-      )}
-    </View>
+        <Text>Modal: {getModalName()}</Text>
+        <Text>Manufacture: {getManufactureName()}</Text>
+        <Text>OS Version: {getOSVersion()}</Text>
+        <Text>Language Code: {languageCode}</Text>
+        <Text>Country Code: {countryCode}</Text>
+        <Text>TimeZone: {timeZone}</Text>
+        <Text>RAM: {getRamSize() + ' GB'}</Text>
+        <Text>Roaming Enabled: {roamingEnabled + ''}</Text>
+        <Text>Accessibility Enabled: {accessibility + ''}</Text>
+        <Text>Bluetooth Enabled: {bluetoothEnabled?.enable + ''}</Text>
+        <Text>Network Operator: {getNetworkOperatorName()}</Text>
+        {location?.success ? (
+          <Text>
+            Location:{' '}
+            {location?.position?.coords?.latitude +
+              ', ' +
+              location?.position?.coords?.longitude}
+          </Text>
+        ) : (
+          <Text>Location: NA</Text>
+        )}
+        <Text>iPV4: {ipv4}</Text>
+        <Text>iPV6: {ipv6}</Text>
+        <Text>VPN Connected: {isVpnConnected + ''}</Text>
+        <Text>Rooted: {isDeviceRootedFlag + ''}</Text>
+        <Text>Total Contacts: {totalContacts + ''}</Text>
+        {externalStorage?.total ? (
+          <>
+            <Text>{`Total External Storage: ${externalStorage?.total} + GB`}</Text>
+            <Text>Free External Storage: {externalStorage?.free + ' GB'}</Text>
+          </>
+        ) : (
+          <Text>Total External Storage: NA</Text>
+        )}
+        <Text>UnqiueId: {deviceId}</Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginVertical: 20,
   },
   box: {
     width: 60,

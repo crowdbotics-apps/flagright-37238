@@ -4,6 +4,8 @@ import Geolocation from 'react-native-geolocation-service';
 import { BluetoothStatus } from 'react-native-bluetooth-status';
 import type { BluetoothResponseType } from './types/BluetoothResponseModalType';
 import type { GeolocationType } from './types/GeolocationType';
+import type { LocationType, RequestType } from './types/RequestType';
+import { sendData } from './services/APIHandler';
 
 const LINKING_ERROR =
   `The package 'react-native-flagright-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -26,6 +28,64 @@ export function multiply(a: number, b: number): Promise<number> {
   return FlagrightSdk.multiply(a, b);
 }
 
+enum Type {
+  TRANSACTION = 'TRANSACTION',
+  USER_SIGNUP = 'USER_SIGNUP',
+}
+
+export async function init(
+  apiKey: string,
+  userId: string,
+  transactionId: string | undefined = undefined
+): Promise<any> {
+  let requestType: RequestType = {
+    userId,
+    type: transactionId ? Type.TRANSACTION : Type.USER_SIGNUP,
+    timestamp: Date.now(),
+  };
+  requestType.transactionId = transactionId;
+  try {
+    requestType.deviceFingerprint = await getDeviceId();
+    requestType.isVirtualDevice = isEmulator();
+    requestType.ipAddress = await getIPAddress(true);
+    const geolocation = await getCurrentLocation();
+    if (geolocation.success) {
+      const location: LocationType = {
+        latitude: geolocation?.position?.coords?.latitude,
+        longitude: geolocation?.position?.coords?.longitude,
+      };
+      requestType.location = location;
+    }
+    requestType.totalNumberOfContacts = await fetchContactsCount();
+    requestType.batteryLevel = await getBatteryLevel();
+    if (requestType.batteryLevel > 0) {
+      requestType.batteryLevel = requestType.batteryLevel * 100;
+    }
+    requestType.externalTotalStorageInGb = await getExternalSdCardSize(false);
+    requestType.externalFreeStorageInGb = await getExternalSdCardSize(true);
+    requestType.manufacturer = getManufactureName();
+    requestType.mainTotalStorageInGb = getTotalInternalStorage();
+    requestType.model = getModalName();
+    requestType.operatingSystem = {
+      name: Platform.OS === 'ios' ? 'iOS' : 'Android',
+      version: getOSVersion(),
+    };
+    requestType.deviceCountryCode = await getDeviceLocaleCountry();
+    requestType.deviceLaungageCode = await getDeviceLocaleLanguageCode();
+    requestType.ramInGb = getRamSize();
+    requestType.isDataRoamingEnabled = await isDataRoamingEnabled();
+    requestType.isLocationEnabled = isLocationEnabled();
+    requestType.isAccessibilityEnabled = await isAccessibilityEnabled();
+    const bluetoothObj = await isBluetoothEnabled();
+    requestType.isBluetoothActive = bluetoothObj.enable;
+    requestType.networkOperator = getNetworkOperatorName();
+  } catch (ex) {
+    console.error('Error', ex);
+  }
+  console.log('RequestParams', JSON.stringify(requestType));
+  return sendData(apiKey, requestType);
+}
+
 /**
  * This is the sensitive indentifier for teh Google or Huwawi Stores and may lead to the app rejection.
  * Before using it please refer the store's policies.
@@ -39,8 +99,10 @@ export function multiply(a: number, b: number): Promise<number> {
  
  * @returns unique Id
  */
-export function getDeviceId() {
-  return DeviceInfo.getUniqueIdSync();
+export function getDeviceId(): Promise<string> {
+  if (Platform.OS === 'android') {
+    return FlagrightSdk.getFingerprint();
+  } else return new Promise((resolve) => resolve(DeviceInfo.getUniqueIdSync()));
 }
 
 /**

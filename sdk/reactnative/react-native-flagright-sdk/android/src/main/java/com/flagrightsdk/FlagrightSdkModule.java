@@ -8,6 +8,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.provider.Settings;
 import android.util.Log;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -205,6 +206,11 @@ public class FlagrightSdkModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getExternalSdCardSize(boolean forFreeStorage,Promise promise) {
       promise.resolve(StorageFetcher.getInstance().getExternalSdCardSize(forFreeStorage));
+    }
+
+    @ReactMethod
+    public void getFingerprint(Promise promise) {
+        promise.resolve(Build.FINGERPRINT);
     }
 
 }
