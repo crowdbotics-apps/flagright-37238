@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 
 import com.flagright.sdk.interfaces.APIInterface;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
+import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
 import com.flagright.sdk.models.RequestModal;
@@ -73,8 +74,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FlagRightInstance {
     private static FlagRightInstance mFlagRightInstance;
     private static RequestModal mRequestModal;
-    private String mAPIKey;
     private enum Type {TRANSACTION, USER_SIGNUP};
+    private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
 
     /**
      * Private constructor for singleton
@@ -82,8 +83,7 @@ public class FlagRightInstance {
     private FlagRightInstance() {
     }
 
-    public void init(Context context, String apiKey, String userId, String transactionId) {
-        mAPIKey = apiKey;
+    public void init(Context context, String apiKey, String userId, String transactionId, ResponseCallback responseCallback) {
         mRequestModal.setUserId(userId);
         mRequestModal.setType(transactionId == null?Type.USER_SIGNUP.name():Type.TRANSACTION.name());
         mRequestModal.setTimestamp(System.currentTimeMillis());
@@ -122,7 +122,7 @@ public class FlagRightInstance {
 //                Gson gson = new Gson();
 //                System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
 
-                submitInfo(context);
+                submitInfo(context, apiKey, responseCallback);
             }
 
             @Override
@@ -130,7 +130,7 @@ public class FlagRightInstance {
                 Gson gson = new Gson();
                 System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
 
-                submitInfo(context);
+                submitInfo(context, apiKey, responseCallback);
             }
         });
 
@@ -514,7 +514,7 @@ public class FlagRightInstance {
         return Build.FINGERPRINT;
     }
 
-    private void submitInfo(Context context)  {
+    private void submitInfo(Context context, String mAPIKey, ResponseCallback responseCallback)  {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // set your desired log level
@@ -525,7 +525,7 @@ public class FlagRightInstance {
         // on below line we are creating a retrofit
         // builder and passing our base url
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/")
+                .baseUrl(BASE_URL)
                 // as we are sending data in json format so
                 // we have to add Gson converter factory
                 .addConverterFactory(GsonConverterFactory.create())
@@ -542,13 +542,16 @@ public class FlagRightInstance {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Log.i("API", response.code()+" "+call.request().body()+" "+call.request().headers().toString());
+                if (response.code() == 200) {
+                   responseCallback.onSuccess();
+                }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("API", t.getMessage()+" "+call.request().url());
-
+                responseCallback.onFailure(t.getMessage());
             }
         });
     }
