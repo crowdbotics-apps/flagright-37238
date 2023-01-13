@@ -23,6 +23,7 @@ class ViewController: UIViewController {
         locationManager = LocationHandler()
         locationManager.determineMyCurrentLocation()
         
+        
         print("The device ID is \(deviceData.deviceID)")
         print("The device language is \(deviceData.language ?? "Error")")
         print("The device country is \(deviceData.country ?? "Error")")

@@ -13,8 +13,6 @@ import CoreTelephony
 import Network
 import LocalAuthentication
 
-
-
 let networkInfo = CTTelephonyNetworkInfo()
 
 public class DataCollection{
@@ -28,7 +26,7 @@ public class DataCollection{
     public let ram = ProcessInfo.processInfo.physicalMemory
     public let systemVersion = UIDevice.current.systemVersion
     public let maker = "Apple"
-    public let modelName = UIDevice.modelName 
+    public let modelName = UIDevice.modelName
 
     public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
     
