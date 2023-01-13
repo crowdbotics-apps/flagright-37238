@@ -19,18 +19,19 @@ public class DataCollection{
     
     public init() {
     }
-     
-    public let deviceID = UIDevice.current.identifierForVendor!.uuidString
-    public let language = NSLocale.current.languageCode
-    public let country = NSLocale.current.regionCode
-    public let ram = ProcessInfo.processInfo.physicalMemory
+    
+    public let deviceID:String = UIDevice.current.identifierForVendor!.uuidString
+    public let language:String = NSLocale.current.languageCode ?? "Error getting language code"
+    public let country:String = NSLocale.current.regionCode ?? "Error getting country code"
+    public let ram:Int = (Int(ProcessInfo.processInfo.physicalMemory) / (1024 * 1024 * 1024))
+    public let systemOS = "iOS"
     public let systemVersion = UIDevice.current.systemVersion
     public let maker = "Apple"
     public let modelName = UIDevice.modelName
 
     public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
     
-    public let carrier:String? = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
+    public let carrier:String = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName ?? "Error getting carrier"
     
     let store = CNContactStore()
     let keysToFetch = [CNContactGivenNameKey]
@@ -48,11 +49,11 @@ public class DataCollection{
         return self.contactArray.count
     }
        
-    public func isSimulator() -> String{
+    public func isSimulator() -> Bool{
 #if targetEnvironment(simulator)
-  return "Simulator"
+  return true
 #else
-  return "Real Device"
+  return false
 #endif
     }
     
@@ -155,26 +156,27 @@ public class DataCollection{
     }
     }
     
-    public func totalMemory(){
+    public func totalMemory()-> Int{
     let fileURL = URL(fileURLWithPath: NSHomeDirectory() as String)
     do {
         let values = try fileURL.resourceValues(forKeys: [.volumeTotalCapacityKey])
         if let capacity = values.volumeTotalCapacity {
-            print("Total capacity: \(capacity)")
+            return (capacity / (1024 * 1024 * 1024))
         } else {
             print("Capacity is unavailable")
         }
     } catch {
         print("Error retrieving capacity: \(error.localizedDescription)")
     }
+        return 0
     }
     
     public var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
     
-    public func getBattery()->Float{
+    public func getBattery()->Int{
         UIDevice.current.isBatteryMonitoringEnabled = true
         let level = UIDevice.current.batteryLevel
-        return level
+        return Int(level*100)
     }
     
     public var isConnectedToVpn: Bool {
@@ -200,7 +202,7 @@ public class DataCollection{
         }
     }
     
-    func getIPAddress() -> String? {
+    public func getIPAddress() -> String? {
         var address : String?
 
         // Get list of all interfaces on the local machine:
@@ -235,6 +237,6 @@ public class DataCollection{
         }
         freeifaddrs(ifaddr)
 
-        return address
+        return address ?? "IP Address fetch failed"
     }
 }

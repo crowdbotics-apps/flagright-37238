@@ -7,42 +7,42 @@
 
 import Foundation
 
-public func makePostRequest(){
+public func makePostRequest(userId: String, type: String){
 
 let headers = ["Content-Type": "application/json"]
 let deviceData = DataCollection()
     
 let parameters = [
-  "userId": "1234",
+  "userId": userId,
   "timestamp": 1672942548000,
-  "type": "USER_SIGNUP",
-  "transactionId": deviceData.deviceID,
-  "deviceFingerprint": "string",
-  "isVirtualDevice": true,
-  "ipAddress": "string",
+  "type": type,
+  "transactionId": "string",
+  "deviceFingerprint": deviceData.deviceID,
+  "isVirtualDevice": deviceData.isSimulator(),
+  "ipAddress": deviceData.getIPAddress() ?? "Could not fetch IP",
   "location": [
     "latitude": 13.0033,
     "longitude": 76.1004
   ],
-  "totalNumberOfContacts": 31,
-  "batteryLevel": 44,
-  "externalTotalStorageInGb": 64,
-  "externalFreeStorageInGb": 3,
-  "manufacturer": "Samsung",
-  "mainTotalStorageInGb": 32,
-  "model": "Galaxy S7",
+  "totalNumberOfContacts": deviceData.getContacts(),
+  "batteryLevel": deviceData.getBattery(),
+  "externalTotalStorageInGb": 0,
+  "externalFreeStorageInGb": 0,
+  "manufacturer": deviceData.maker,
+  "mainTotalStorageInGb": deviceData.totalMemory(),
+  "model": deviceData.modelName,
   "operatingSystem": [
-    "name": "Android",
-    "version": "12.3.1˜"
+    "name": deviceData.systemOS,
+    "version": deviceData.systemVersion
   ],
-  "deviceCountryCode": "IN",
-  "deviceLaungageCode": "KA",
-  "ramInGb": 4,
+  "deviceCountryCode": deviceData.country,
+  "deviceLaungageCode": deviceData.language,
+  "ramInGb": deviceData.ram,
   "isDataRoamingEnabled": true,
   "isLocationEnabled": true,
-  "isAccessibilityEnabled": true,
+  "isAccessibilityEnabled": deviceData.checkAccessibilityEnabled(),
   "isBluetoothActive": true,
-  "networkOperator": "Airtel"
+  "networkOperator": deviceData.carrier
 ] as [String : Any]
 
 let postData = try? JSONSerialization.data(withJSONObject: parameters, options: [])

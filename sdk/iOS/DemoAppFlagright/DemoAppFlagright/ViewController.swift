@@ -10,7 +10,6 @@ import FrameworkFlagright
 import SwiftUI
 
 class ViewController: UIViewController {
-        
     var bleManager: BLEManager!
     var locationManager: LocationHandler!
         
@@ -23,21 +22,25 @@ class ViewController: UIViewController {
         locationManager = LocationHandler()
         locationManager.determineMyCurrentLocation()
         
+        makePostRequest(userId: "1234", type: "USER_SIGNUP")
         
         print("The device ID is \(deviceData.deviceID)")
-        print("The device language is \(deviceData.language ?? "Error")")
-        print("The device country is \(deviceData.country ?? "Error")")
+        print("The IP adress is \(deviceData.getIPAddress() ?? "Not fetched")")
+
+        
+        print("The device language is \(deviceData.language )")
+        print("The device country is \(deviceData.country )")
         print("The device localTimeZone \(deviceData.localTimeZoneAbbreviation)")
         print("The total RAM is \(deviceData.ram)")
         deviceData.availableMemory()
-        deviceData.totalMemory()
+        print(deviceData.totalMemory())
         print("The device is \(deviceData.isSimulator())")
         print("The ios version is \(deviceData.systemVersion)")
         print("The model is \(deviceData.modelName)")
         print("The maker is \(deviceData.maker)")
         print("The battery is \(deviceData.getBattery())")
         print("The VPN connection status is \(deviceData.isConnectedToVpn)")
-        print("The carrier is \(deviceData.carrier ?? "Error")")
+        print("The carrier is \(deviceData.carrier )")
         print("Biometric type \(deviceData.getBiometricSupported())")
         
         print("The jailbreak status is \(deviceData.jailBreakStatus())")
