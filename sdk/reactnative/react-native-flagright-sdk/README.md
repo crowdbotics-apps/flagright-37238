@@ -17,11 +17,17 @@ yarn add react-native-flagright-sdk
 ## Usage
 
 ```js
-import { multiply } from 'react-native-flagright-sdk';
+import { init } from 'react-native-flagright-sdk';
 
 // ...
 
-const result = await multiply(3, 7);
+const result = await init('123', '1234');
+```
+
+With transaction id
+
+```js
+const result = await init("123", "1234", "12345678);
 ```
 
 ## Contributing
