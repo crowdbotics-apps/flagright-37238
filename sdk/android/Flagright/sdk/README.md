@@ -54,26 +54,3 @@ flagRightInstance.init(this, "123", "1234", null, new ResponseCallback() {
 | init(context, apiKey, userId, transactionId, responseCallback) | Method fetch all the required attributes and send them to the Flagright Server. |
 
 
-## Integration
-
-
-
-```bash
-  To import this module into your project, proceed as follows:
-
-    1. Click File > New > Import Module.
-    2. In the Source directory box, browse to Flagright SDK.
-    3. Click Finish.
-
-Once the module is imported, it appears in the Project window on the left.
-```
-For more informtion regarding adding an exsting module into Android project, please visit this [link](https://developer.android.com/studio/projects/add-app-module).
-
-
-## Features
-
-- isEmulator()
-- Get IPv4 and IPv6 address
-- 
-- Cross platform
-
