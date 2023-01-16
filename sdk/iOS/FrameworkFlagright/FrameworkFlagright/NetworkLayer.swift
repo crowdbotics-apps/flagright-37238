@@ -21,8 +21,8 @@ let parameters = [
   "isVirtualDevice": deviceData.isSimulator(),
   "ipAddress": deviceData.getIPAddress() ?? "Could not fetch IP",
   "location": [
-    "latitude": 13.0033,
-    "longitude": 76.1004
+    "latitude": deviceData.latitude,
+    "longitude": deviceData.longitude
   ],
   "totalNumberOfContacts": deviceData.getContacts(),
   "batteryLevel": deviceData.getBattery(),
@@ -39,7 +39,7 @@ let parameters = [
   "deviceLaungageCode": deviceData.language,
   "ramInGb": deviceData.ram,
   "isDataRoamingEnabled": true,
-  "isLocationEnabled": true,
+  "isLocationEnabled": deviceData.checkLocationEnabled ?? false,
   "isAccessibilityEnabled": deviceData.checkAccessibilityEnabled(),
   "isBluetoothActive": true,
   "networkOperator": deviceData.carrier

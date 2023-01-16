@@ -12,14 +12,24 @@ import ContactsUI
 import CoreTelephony
 import Network
 import LocalAuthentication
+import CoreBluetooth
 
 let networkInfo = CTTelephonyNetworkInfo()
 
 public class DataCollection{
-    
+    var locationManager: LocationHandler!
+    public var checkLocationEnabled: Bool?
+    public var longitude: Double?
+    public var latitude: Double?
+
     public init() {
+        locationManager = LocationHandler()
+        locationManager.determineMyCurrentLocation()
+        checkLocationEnabled = locationManager.isLocationEnabled()
+        longitude = locationManager.getLongitude()
+        latitude = locationManager.getLatitude()
     }
-    
+        
     public let deviceID:String = UIDevice.current.identifierForVendor!.uuidString
     public let language:String = NSLocale.current.languageCode ?? "Error getting language code"
     public let country:String = NSLocale.current.regionCode ?? "Error getting country code"

@@ -41,5 +41,4 @@ public class BLEHandler : NSObject, CBCentralManagerDelegate {
             break
         }
     }
-    
 }

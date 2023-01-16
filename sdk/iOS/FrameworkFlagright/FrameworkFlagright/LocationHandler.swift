@@ -40,16 +40,31 @@ public override init() {
 
        print("user latitude = \(userLocation.coordinate.latitude)")
        print("user longitude = \(userLocation.coordinate.longitude)")
-
-      switch manager.authorizationStatus {
+   }
+    
+    public func getLongitude()->Double{
+       let longitude = CLLocationManager().location?.coordinate.longitude ?? 0.00
+        return longitude
+    }
+    
+    public func getLatitude()->Double{
+       let latitude = CLLocationManager().location?.coordinate.latitude ?? 0.00
+        return latitude
+    }
+    
+    public func isLocationEnabled() -> Bool{
+        switch CLLocationManager().authorizationStatus {
          case .notDetermined, .restricted, .denied:
-             print("No access")
+             print("Location Disabled")
+             return false
          case .authorizedAlways, .authorizedWhenInUse:
-             print("Access")
+             print("Location Enabled")
+             return true
          @unknown default:
              break
      }
-   }
+        return false
+    }
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
    {

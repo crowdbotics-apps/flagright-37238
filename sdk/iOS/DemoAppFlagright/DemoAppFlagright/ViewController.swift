@@ -11,19 +11,15 @@ import SwiftUI
 
 class ViewController: UIViewController {
     var bleManager: BLEManager!
-    var locationManager: LocationHandler!
         
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let deviceData = DataCollection()
         
-        bleManager = BLEManager()
-        
-        locationManager = LocationHandler()
-        locationManager.determineMyCurrentLocation()
         
         makePostRequest(userId: "1234", type: "USER_SIGNUP")
         
+
         print("The device ID is \(deviceData.deviceID)")
         print("The IP adress is \(deviceData.getIPAddress() ?? "Not fetched")")
 
@@ -48,6 +44,9 @@ class ViewController: UIViewController {
         print("Checking accesibility \(deviceData.checkAccessibilityEnabled())")
         print("IP address type is \(deviceData.ipAddressType())")
         print("Total number of contacts are \(deviceData.getContacts())")
+        print("Device Location status \(String(describing: deviceData.checkLocationEnabled))")
+        print("Device Longitude \(String(describing: deviceData.longitude))")
+        print("Device Latitude \(String(describing: deviceData.latitude))")
         // Do any additional setup after loading the view.
     }
     
