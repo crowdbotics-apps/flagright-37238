@@ -7,6 +7,9 @@ import android.util.Log;
 import java.io.File;
 import java.math.BigInteger;
 
+/**
+ * Class exposes the methods to get the storage information
+ */
 public class StorageFetcher {
     private static StorageFetcher mStorageFetcher;
 
@@ -14,6 +17,11 @@ public class StorageFetcher {
 
     }
 
+    /**
+     * get the instance of the {@link StorageFetcher}
+     *
+     * @return return instance of {@link StorageFetcher}
+     */
     public static StorageFetcher getInstance() {
         if (mStorageFetcher == null) {
             mStorageFetcher = new StorageFetcher();

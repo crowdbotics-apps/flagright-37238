@@ -68,6 +68,15 @@ public class RequestModal {
     private boolean isAccessibilityEnabled;
     private boolean isBluetoothActive;
     private String networkOperator;
+    private String transactionId;
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 
     public String getNetworkOperator() {
         return networkOperator;

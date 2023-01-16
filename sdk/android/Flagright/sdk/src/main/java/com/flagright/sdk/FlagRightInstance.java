@@ -95,6 +95,9 @@ public class FlagRightInstance {
     public void init(Context context, String apiKey, String userId, String transactionId, ResponseCallback responseCallback) {
         mRequestModal.setUserId(userId);
         mRequestModal.setType(transactionId == null?Type.USER_SIGNUP.name():Type.TRANSACTION.name());
+        if (transactionId != null) {
+            mRequestModal.setTransactionId(transactionId);
+        }
         mRequestModal.setTimestamp(System.currentTimeMillis());
         mRequestModal.setDeviceLaungageCode(getDeviceLocaleLanguageCode());
         mRequestModal.setDeviceFingerprint(getFingerprint());

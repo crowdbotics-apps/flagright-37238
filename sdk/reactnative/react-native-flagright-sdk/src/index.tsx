@@ -263,7 +263,10 @@ export function isBluetoothEnabled(): Promise<BluetoothResponseType> {
           .then((btStatus) => {
             resolve({ enable: btStatus ?? false } as BluetoothResponseType);
           })
-          .catch((er) => resolve({ enable: false } as BluetoothResponseType));
+          .catch((er) => {
+            resolve({ enable: false } as BluetoothResponseType);
+            console.error('error', er);
+          });
       });
     } else return FlagrightSdk.isBluetoothEnabled();
   } catch (ex) {
@@ -284,7 +287,7 @@ export function getCurrentLocation(
     maximumAge: 10000,
   }
 ): Promise<GeolocationType> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization('whenInUse')
         .then((value) => {
@@ -298,7 +301,8 @@ export function getCurrentLocation(
             resolve({ success: false });
           }
         })
-        .catch((ex) => {
+        .catch((ex: any) => {
+          console.error('Error', ex);
           resolve({ success: false });
         });
     } else
