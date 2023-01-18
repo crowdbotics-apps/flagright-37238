@@ -36,8 +36,6 @@ public override init() {
     
       manager.stopUpdatingLocation()
 
-//       print("user latitude = \(userLocation.coordinate.latitude)")
-//       print("user longitude = \(userLocation.coordinate.longitude)")
    }
     
     public func getLongitude()->Double{
@@ -46,7 +44,7 @@ public override init() {
     }
     
     public func getLatitude()->Double{
-       let latitude = CLLocationManager().location?.coordinate.latitude ?? 0.00
+        let latitude = CLLocationManager().location?.coordinate.latitude ?? 0.00
         return latitude
     }
     

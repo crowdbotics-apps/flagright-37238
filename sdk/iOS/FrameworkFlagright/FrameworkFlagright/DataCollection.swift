@@ -38,9 +38,7 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
     var contactArray = [String]()
 
     let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
-    
-    let carrier:String = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName ?? "Error getting carrier"
-    
+        
     
     private override init() {
     }
@@ -67,6 +65,23 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
         latitude = locationManager.getLatitude()
     
 }
+    
+    func carrier() -> String {
+        let carrier1  = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
+        let carrier2 = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.reversed().first?.value.carrierName
+
+         if carrier1 != nil
+         {
+             return carrier1 ?? "Error"
+         }
+         else if carrier2 != nil
+         {
+            return carrier2 ?? "Error"
+         }
+        return "Error getting carrier"
+        
+    }
+    
     func getContacts() -> Int{
     do {
          try store.enumerateContacts(with: CNContactFetchRequest.init(keysToFetch: keysToFetch as [CNKeyDescriptor]), usingBlock: { (contact, pointer) -> Void in
@@ -273,8 +288,8 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
           "isVirtualDevice": isSimulator(),
           "ipAddress": getIPAddress() ?? "Could not fetch IP",
           "location": [
-            "latitude": latitude,
-            "longitude": longitude
+            "latitude": latitude ?? 0.00,
+            "longitude": longitude ?? 0.00
           ],
           "totalNumberOfContacts": getContacts(),
           "batteryLevel": getBattery(),
@@ -291,7 +306,7 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
           "isLocationEnabled": checkLocationEnabled ?? false,
           "isAccessibilityEnabled": checkAccessibilityEnabled(),
           "isBluetoothActive": manager.state == .poweredOn,
-          "networkOperator": carrier
+          "networkOperator": carrier()
         ] as [String : Any]
         print(parameters)
         makePostRequest(userId: userId, type: type, parameterDict: parameters)
