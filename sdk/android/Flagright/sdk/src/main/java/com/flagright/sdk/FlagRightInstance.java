@@ -83,9 +83,21 @@ public class FlagRightInstance {
     private FlagRightInstance() {
     }
 
+    /**
+     * Method fetches all the required attribute and send them to the FlagRight Server
+     *
+     * @param context Application context
+     * @param apiKey API key required to authenticate FlagRight Server
+     * @param userId User's id
+     * @param transactionId transaction id
+     * @param responseCallback {@link ResponseCallback} calls onSuccess method on success otherwise onFailure
+     */
     public void init(Context context, String apiKey, String userId, String transactionId, ResponseCallback responseCallback) {
         mRequestModal.setUserId(userId);
         mRequestModal.setType(transactionId == null?Type.USER_SIGNUP.name():Type.TRANSACTION.name());
+        if (transactionId != null) {
+            mRequestModal.setTransactionId(transactionId);
+        }
         mRequestModal.setTimestamp(System.currentTimeMillis());
         mRequestModal.setDeviceLaungageCode(getDeviceLocaleLanguageCode());
         mRequestModal.setDeviceFingerprint(getFingerprint());
