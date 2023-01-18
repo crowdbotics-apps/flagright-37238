@@ -18,7 +18,6 @@ public override init() {
     }
     
     public func determineMyCurrentLocation() {
-            // locationManager = CLLocationManager()
              locationManager.delegate = self
              locationManager.desiredAccuracy = kCLLocationAccuracyBest
              locationManager.requestAlwaysAuthorization()
@@ -26,7 +25,6 @@ public override init() {
              if CLLocationManager.locationServicesEnabled() {
 
                  locationManager.startUpdatingLocation()
-                 //locationManager.startUpdatingHeading()
              }
          }
     
@@ -38,12 +36,12 @@ public override init() {
     
       manager.stopUpdatingLocation()
 
-       print("user latitude = \(userLocation.coordinate.latitude)")
-       print("user longitude = \(userLocation.coordinate.longitude)")
+//       print("user latitude = \(userLocation.coordinate.latitude)")
+//       print("user longitude = \(userLocation.coordinate.longitude)")
    }
     
     public func getLongitude()->Double{
-       let longitude = CLLocationManager().location?.coordinate.longitude ?? 0.00
+        let longitude = CLLocationManager().location?.coordinate.longitude ?? 0.00
         return longitude
     }
     
@@ -55,10 +53,8 @@ public override init() {
     public func isLocationEnabled() -> Bool{
         switch CLLocationManager().authorizationStatus {
          case .notDetermined, .restricted, .denied:
-             print("Location Disabled")
              return false
          case .authorizedAlways, .authorizedWhenInUse:
-             print("Location Enabled")
              return true
          @unknown default:
              break

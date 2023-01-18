@@ -7,45 +7,11 @@
 
 import Foundation
 
-public func makePostRequest(userId: String, type: String){
+func makePostRequest(userId: String, type: String, parameterDict: [String:Any]){
 
 let headers = ["Content-Type": "application/json"]
-let deviceData = DataCollection()
-    
-let parameters = [
-  "userId": userId,
-  "timestamp": 1672942548000,
-  "type": type,
-  "transactionId": "string",
-  "deviceFingerprint": deviceData.deviceID,
-  "isVirtualDevice": deviceData.isSimulator(),
-  "ipAddress": deviceData.getIPAddress() ?? "Could not fetch IP",
-  "location": [
-    "latitude": deviceData.latitude,
-    "longitude": deviceData.longitude
-  ],
-  "totalNumberOfContacts": deviceData.getContacts(),
-  "batteryLevel": deviceData.getBattery(),
-  "externalTotalStorageInGb": 0,
-  "externalFreeStorageInGb": 0,
-  "manufacturer": deviceData.maker,
-  "mainTotalStorageInGb": deviceData.totalMemory(),
-  "model": deviceData.modelName,
-  "operatingSystem": [
-    "name": deviceData.systemOS,
-    "version": deviceData.systemVersion
-  ],
-  "deviceCountryCode": deviceData.country,
-  "deviceLaungageCode": deviceData.language,
-  "ramInGb": deviceData.ram,
-  "isDataRoamingEnabled": true,
-  "isLocationEnabled": deviceData.checkLocationEnabled ?? false,
-  "isAccessibilityEnabled": deviceData.checkAccessibilityEnabled(),
-  "isBluetoothActive": true,
-  "networkOperator": deviceData.carrier
-] as [String : Any]
 
-let postData = try? JSONSerialization.data(withJSONObject: parameters, options: [])
+let postData = try? JSONSerialization.data(withJSONObject: parameterDict, options: [])
 
 let request = NSMutableURLRequest(url: NSURL(string: "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/device/metric")! as URL,
                                         cachePolicy: .useProtocolCachePolicy,
