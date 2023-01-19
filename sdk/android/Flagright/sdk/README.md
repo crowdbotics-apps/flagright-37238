@@ -29,12 +29,12 @@ The locations and the read contact permissions are comes under the dangerous per
 
 ##### Once we have the required permssions we can now consume the FlagrightSdk. In order to get the instance of FlagrightSdk add the following line:-
 ```bash
-FlagRightInstance flagRightInstance = FlagRightInstance.getInstance();
+FlagrightDeviceMetricsSDK flagrightDeviceMetricsSDK = FlagrightDeviceMetricsSDK.getInstance();
 
 ```
 ##### after getting the instance call the init method
 ```bash
-flagRightInstance.init(this, "123", "1234", null, new ResponseCallback() {
+flagrightDeviceMetricsSDK.init(this, "123", "1234", null, new ResponseCallback() {
             @Override
             public void onSuccess() {
                 // successfully uploaded the required attributes

@@ -5,21 +5,14 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.hardware.biometrics.BiometricManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.StatFs;
-import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -36,29 +29,10 @@ import com.flagright.sdk.models.RequestModal;
 import com.google.gson.Gson;
 import com.scottyab.rootbeer.RootBeer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.net.HttpURLConnection;
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -71,8 +45,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FlagRightInstance {
-    private static FlagRightInstance mFlagRightInstance;
+public class FlagrightDeviceMetricsSDK {
+    private static FlagrightDeviceMetricsSDK mFlagrightDeviceMetricsSDK;
     private static RequestModal mRequestModal;
     private enum Type {TRANSACTION, USER_SIGNUP};
     private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
@@ -80,7 +54,7 @@ public class FlagRightInstance {
     /**
      * Private constructor for singleton
      */
-    private FlagRightInstance() {
+    private FlagrightDeviceMetricsSDK() {
     }
 
     /**
@@ -156,14 +130,14 @@ public class FlagRightInstance {
     /**
      * Method initialize the instance only one time
      *
-     * @return instance of the {@link FlagRightInstance}
+     * @return instance of the {@link FlagrightDeviceMetricsSDK}
      */
-    public static FlagRightInstance getInstance() {
-        if (mFlagRightInstance == null) {
+    public static FlagrightDeviceMetricsSDK getInstance() {
+        if (mFlagrightDeviceMetricsSDK == null) {
             mRequestModal = new RequestModal();
-            mFlagRightInstance = new FlagRightInstance();
+            mFlagrightDeviceMetricsSDK = new FlagrightDeviceMetricsSDK();
         }
-        return mFlagRightInstance;
+        return mFlagrightDeviceMetricsSDK;
     }
 
 

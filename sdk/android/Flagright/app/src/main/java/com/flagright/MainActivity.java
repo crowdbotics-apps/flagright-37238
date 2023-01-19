@@ -1,6 +1,5 @@
 package com.flagright;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -13,7 +12,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.flagright.sdk.FlagRightInstance;
+import com.flagright.sdk.FlagrightDeviceMetricsSDK;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
 
@@ -28,25 +27,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FlagRightInstance flagRightInstance = FlagRightInstance.getInstance();
-        boolean isEmulator = flagRightInstance.isEmulator();
+        FlagrightDeviceMetricsSDK flagrightDeviceMetricsSDK = FlagrightDeviceMetricsSDK.getInstance();
+        boolean isEmulator = flagrightDeviceMetricsSDK.isEmulator();
 
         TextView emulatorTextView = findViewById(R.id.emulator);
         emulatorTextView.setText("Is Emulator: " + isEmulator);
 
         TextView ip4TextView = findViewById(R.id.addressIP4);
-        ip4TextView.setText("Ip4 Address: " + flagRightInstance.getIPAddress(true));
+        ip4TextView.setText("Ip4 Address: " + flagrightDeviceMetricsSDK.getIPAddress(true));
         TextView ip6TextView = findViewById(R.id.addressIP6);
-        ip6TextView.setText("Ip6 Address: " + flagRightInstance.getIPAddress(false));
+        ip6TextView.setText("Ip6 Address: " + flagrightDeviceMetricsSDK.getIPAddress(false));
         TextView vpn = findViewById(R.id.vpn);
-        vpn.setText("VPN connected: " + flagRightInstance.isDeviceConnectedToVPN(this));
+        vpn.setText("VPN connected: " + flagrightDeviceMetricsSDK.isDeviceConnectedToVPN(this));
 
         TextView biometric = findViewById(R.id.biometric);
-        biometric.setText("Biometric enabled: " + flagRightInstance.isBioMetricEnabled(this));
+        biometric.setText("Biometric enabled: " + flagrightDeviceMetricsSDK.isBioMetricEnabled(this));
         TextView rooted = findViewById(R.id.rooted);
         locationTextView = findViewById(R.id.location);
         new Thread(() -> {
-            boolean isRooted = flagRightInstance.isDeviceRooted(MainActivity.this);
+            boolean isRooted = flagrightDeviceMetricsSDK.isDeviceRooted(MainActivity.this);
             runOnUiThread(() -> {
                 rooted.setText("Rooted: " + isRooted);
             });
@@ -63,94 +62,94 @@ public class MainActivity extends AppCompatActivity {
         TextView batteryLevel = findViewById(R.id.batteryLevel);
         batteryLevel.setText(new StringBuilder()
                 .append("Battery Level: ")
-                .append(flagRightInstance.getBatteryLevel(this).getLevel()));
+                .append(flagrightDeviceMetricsSDK.getBatteryLevel(this).getLevel()));
 
        // total internal storage
         TextView internalStorageTextView = findViewById(R.id.internalStorage);
         internalStorageTextView.setText(new StringBuilder()
                 .append("Storage: ")
-                .append(flagRightInstance.getTotalInternalStorage()).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getTotalInternalStorage()).append(" GB"));
 
         // free internal storage
         TextView freeInternalStorageTextView = findViewById(R.id.freeInternal);
         freeInternalStorageTextView.setText(new StringBuilder()
                 .append("Free Storage: ")
-                .append(flagRightInstance.getFreeInternalStorage()).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getFreeInternalStorage()).append(" GB"));
 
         // total external storage
         TextView totalExternalStorage = findViewById(R.id.totalExternalStorage);
         totalExternalStorage.setText(new StringBuilder()
                 .append("External Storage: ")
-                .append(flagRightInstance.getExternalSdCardSize(false)).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(false)).append(" GB"));
         //free external storage
         TextView freeExternalStorage = findViewById(R.id.freeExternalStorage);
         freeExternalStorage.setText(new StringBuilder()
                 .append("External Storage Free: ")
-                .append(flagRightInstance.getExternalSdCardSize(true)).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(true)).append(" GB"));
         // get Modal name
         TextView modal = findViewById(R.id.modal);
         modal.setText(new StringBuilder()
                 .append("Modal: ")
-                .append(flagRightInstance.getModalName()));
+                .append(flagrightDeviceMetricsSDK.getModalName()));
         // get Manufacture name
         TextView manufacture = findViewById(R.id.manufacture);
         manufacture.setText(new StringBuilder()
                 .append("Manufacture: ")
-                .append(flagRightInstance.getManufactureName()));
+                .append(flagrightDeviceMetricsSDK.getManufactureName()));
         // get OS version
         TextView osVersion = findViewById(R.id.os);
         osVersion.setText(new StringBuilder()
                 .append("OS: ")
-                .append(flagRightInstance.getOSVersion()));
+                .append(flagrightDeviceMetricsSDK.getOSVersion()));
         // get language version
         TextView languageCode = findViewById(R.id.languageCode);
         languageCode.setText(new StringBuilder()
                 .append("Language: ")
-                .append(flagRightInstance.getDeviceLocaleLanguageCode()));
+                .append(flagrightDeviceMetricsSDK.getDeviceLocaleLanguageCode()));
         // get country code
         TextView countryCode = findViewById(R.id.countryCode);
         countryCode.setText(new StringBuilder()
                 .append("Country Code: ")
-                .append(flagRightInstance.getDeviceLocaleCountry()));
+                .append(flagrightDeviceMetricsSDK.getDeviceLocaleCountry()));
         // get timezone
         TextView timeZone = findViewById(R.id.timeZone);
         timeZone.setText(new StringBuilder()
                 .append("TimeZone: ")
-                .append(flagRightInstance.getDeviceTimeZone()));
+                .append(flagrightDeviceMetricsSDK.getDeviceTimeZone()));
         // get ram size
         TextView ramSize = findViewById(R.id.ramSize);
         ramSize.setText(new StringBuilder()
                 .append("RAM: ")
-                .append(flagRightInstance.getRamSize(this))
+                .append(flagrightDeviceMetricsSDK.getRamSize(this))
                 .append(" GB"));
         // data roaming
         TextView roaming = findViewById(R.id.roaming);
         roaming.setText(new StringBuilder()
                 .append("Roaming enabled: ")
-                .append(flagRightInstance.isDataRoamingEnabled(this)));
+                .append(flagrightDeviceMetricsSDK.isDataRoamingEnabled(this)));
         // Accessibility
         TextView accessibility = findViewById(R.id.accessibility);
         accessibility.setText(new StringBuilder()
                 .append("Accessibility enabled: ")
-                .append(flagRightInstance.isAccessibilityEnabled(this)));
+                .append(flagrightDeviceMetricsSDK.isAccessibilityEnabled(this)));
         // Bluetooth
         TextView bluetoothEnabled = findViewById(R.id.bluetooth);
         bluetoothEnabled.setText(new StringBuilder()
                 .append("Bluetooth enabled: ")
-                .append(flagRightInstance.isBluetoothEnabled().isEnable()));
+                .append(flagrightDeviceMetricsSDK.isBluetoothEnabled().isEnable()));
         // Network Operator
         TextView networkOperator = findViewById(R.id.networkOperator);
         networkOperator.setText(new StringBuilder()
                 .append("Network Operator: ")
-                .append(flagRightInstance.getNetworkOperatorName(this)));
+                .append(flagrightDeviceMetricsSDK.getNetworkOperatorName(this)));
         // Fingerprint
         TextView fingerPrint = findViewById(R.id.fingerPrint);
         fingerPrint.setText(new StringBuilder()
                 .append("Fingerprint: ")
-                .append(flagRightInstance.getFingerprint()));
-        System.out.println("FingerPrint: "+flagRightInstance.getFingerprint());
+                .append(flagrightDeviceMetricsSDK.getFingerprint()));
+        System.out.println("FingerPrint: "+ flagrightDeviceMetricsSDK.getFingerprint());
 
-        FlagRightInstance.getInstance().init(this, "123", "1234", null, new ResponseCallback() {
+        FlagrightDeviceMetricsSDK.getInstance().init(this, "123", "1234", null, new ResponseCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(MainActivity.this, "Data uploaded successfully", Toast.LENGTH_SHORT).show();
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchLocation() {
-        FlagRightInstance.getInstance().fetchCurrentLocation(this, new LocationFoundCallback() {
+        FlagrightDeviceMetricsSDK.getInstance().fetchCurrentLocation(this, new LocationFoundCallback() {
             @Override
             public void locationFound(Location location) {
                 Log.i("Location", location.toString());
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView locationEnTextView = findViewById(R.id.locationEnabled);
         locationEnTextView.setText(new StringBuilder().append("Location Enabled: ")
-                .append(FlagRightInstance.getInstance().isLocationEnabled(this)));
+                .append(FlagrightDeviceMetricsSDK.getInstance().isLocationEnabled(this)));
     }
 
     private void fetchContacts() {
@@ -223,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED) {
             TextView contactsCount = findViewById(R.id.contactsCount);
             contactsCount.setText(new StringBuilder().append("Total Contacts: ")
-                    .append(FlagRightInstance.getInstance().fetchContactsCount(this)).toString());
+                    .append(FlagrightDeviceMetricsSDK.getInstance().fetchContactsCount(this)).toString());
         }
     }
 
