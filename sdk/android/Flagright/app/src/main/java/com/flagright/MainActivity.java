@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 .append("Battery Level: ")
                 .append(flagrightDeviceMetricsSDK.getBatteryLevel(this).getLevel()));
 
-       // total internal storage
+        // total internal storage
         TextView internalStorageTextView = findViewById(R.id.internalStorage);
         internalStorageTextView.setText(new StringBuilder()
                 .append("Storage: ")
@@ -152,17 +152,17 @@ public class MainActivity extends AppCompatActivity {
         flagrightDeviceMetricsSDK.init( "123", "");
         flagrightDeviceMetricsSDK.emit(this, "1234", null,
                 new ResponseCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
-                        Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
+                                Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onFailure(String errorMessage) {
-                Log.e("Error", errorMessage);
-            }
-        });
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Log.e("Error", errorMessage);
+                    }
+                });
     }
 
     private void requestAppPermissions() {

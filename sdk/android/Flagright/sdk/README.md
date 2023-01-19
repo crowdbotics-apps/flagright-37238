@@ -34,23 +34,30 @@ FlagrightDeviceMetricsSDK flagrightDeviceMetricsSDK = FlagrightDeviceMetricsSDK.
 ```
 ##### after getting the instance call the init method
 ```bash
-flagrightDeviceMetricsSDK.init(this, "123", "1234", null, new ResponseCallback() {
-            @Override
-            public void onSuccess() {
-                // successfully uploaded the required attributes
-            }
+flagrightDeviceMetricsSDK.init( "123", "");
+```
+#### and then call emit method to send all the fetched attributes over Flagright server
+```bash
+flagrightDeviceMetricsSDK.emit(this, "1234", null,
+                new ResponseCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
+                                Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onFailure(String errorMessage) {
-                // error in the call
-            }
-    });
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Log.e("Error", errorMessage);
+                    }
+                });
 ```
 
 ## Methods
 | Method | Description |
 | ------ | ------ |
-| getInstance() | Get the instance of the Flagright SDK |
-| init(context, apiKey, userId, transactionId, responseCallback) | Method fetch all the required attributes and send them to the Flagright Server. |
+| getInstance() | Get the instance of the Flagright SDK. |
+| init(apiKey, region) | Method initialize the api key and the region which is required for the server authentication. |
+| emit(context, userId, transactionId, responseCallback) | Method gets all the required attributes from device and send them over server. |
 
 
