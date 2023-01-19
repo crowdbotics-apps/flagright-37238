@@ -46,10 +46,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlagrightDeviceMetricsSDK {
+    private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
     private static FlagrightDeviceMetricsSDK mFlagrightDeviceMetricsSDK;
     private static RequestModal mRequestModal;
-    private enum Type {TRANSACTION, USER_SIGNUP};
-    private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
+    private static String mApiKey;
+    private static String mRegion;
+
+    ;
 
     /**
      * Private constructor for singleton
@@ -58,17 +61,41 @@ public class FlagrightDeviceMetricsSDK {
     }
 
     /**
-     * Method fetches all the required attribute and send them to the FlagRight Server
+     * Method initialize the instance only one time
      *
-     * @param context Application context
-     * @param apiKey API key required to authenticate FlagRight Server
-     * @param userId User's id
-     * @param transactionId transaction id
-     * @param responseCallback {@link ResponseCallback} calls onSuccess method on success otherwise onFailure
+     * @return instance of the {@link FlagrightDeviceMetricsSDK}
      */
-    public void init(Context context, String apiKey, String userId, String transactionId, ResponseCallback responseCallback) {
+    public static FlagrightDeviceMetricsSDK getInstance() {
+        if (mFlagrightDeviceMetricsSDK == null) {
+            mRequestModal = new RequestModal();
+            mFlagrightDeviceMetricsSDK = new FlagrightDeviceMetricsSDK();
+        }
+        return mFlagrightDeviceMetricsSDK;
+    }
+
+    /**
+     * Method accepted the API key which would be required for Server Authentication purpose
+     *
+     * @param apiKey API key required to authenticate FlagRight Server
+     */
+    public void init(String apiKey, String region) {
+        mApiKey = apiKey;
+        mRegion = region;
+    }
+
+    /**
+     * This method needs to call after the init method. This method gets all the required
+     * attributes from device and then call the
+     * {@link #submitInfo(Context, ResponseCallback) submitInfo} method
+     *
+     * @param context
+     * @param userId
+     * @param transactionId
+     * @param responseCallback
+     */
+    public void emit(Context context, String userId, String transactionId, ResponseCallback responseCallback) {
         mRequestModal.setUserId(userId);
-        mRequestModal.setType(transactionId == null?Type.USER_SIGNUP.name():Type.TRANSACTION.name());
+        mRequestModal.setType(transactionId == null ? Type.USER_SIGNUP.name() : Type.TRANSACTION.name());
         if (transactionId != null) {
             mRequestModal.setTransactionId(transactionId);
         }
@@ -104,42 +131,17 @@ public class FlagrightDeviceMetricsSDK {
                 loc.setLatitude(location.getLatitude());
                 loc.setLongitude(location.getLongitude());
                 mRequestModal.setLocation(loc);
-
-//                Gson gson = new Gson();
-//                System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
-
-                submitInfo(context, apiKey, responseCallback);
+                submitInfo(context, responseCallback);
             }
 
             @Override
             public void locationError(String error) {
                 Gson gson = new Gson();
-                System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
-
-                submitInfo(context, apiKey, responseCallback);
+                System.out.println("RequestModal " + gson.toJson(mRequestModal).toString());
+                submitInfo(context, responseCallback);
             }
         });
-
-//        Gson gson = new Gson();
-//        System.out.println("RequestModal " +gson.toJson(mRequestModal).toString());
-//
-//        submitInfo(context);
-
     }
-
-    /**
-     * Method initialize the instance only one time
-     *
-     * @return instance of the {@link FlagrightDeviceMetricsSDK}
-     */
-    public static FlagrightDeviceMetricsSDK getInstance() {
-        if (mFlagrightDeviceMetricsSDK == null) {
-            mRequestModal = new RequestModal();
-            mFlagrightDeviceMetricsSDK = new FlagrightDeviceMetricsSDK();
-        }
-        return mFlagrightDeviceMetricsSDK;
-    }
-
 
     /**
      * Method checks if the application is running on a real device or not
@@ -500,45 +502,56 @@ public class FlagrightDeviceMetricsSDK {
         return Build.FINGERPRINT;
     }
 
-    private void submitInfo(Context context, String mAPIKey, ResponseCallback responseCallback)  {
+    /**
+     * Method send all attributes to the Flagright server
+     *
+     * @param context          Context of the Application
+     * @param responseCallback {@link ResponseCallback}
+     */
+    private void submitInfo(Context context, ResponseCallback responseCallback) {
+        if (mApiKey != null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            // set your desired log level
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+            httpClient.addInterceptor(logging);
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        // set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-
-        // on below line we are creating a retrofit
-        // builder and passing our base url
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                // as we are sending data in json format so
-                // we have to add Gson converter factory
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(httpClient.build())
-        // at last we are building our retrofit builder.
-                .build();
-        // below line is to create an instance for our APIInterface api class.
-        APIInterface retrofitAPI = retrofit.create(APIInterface.class);
+            // on below line we are creating a retrofit
+            // builder and passing our base url
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    // as we are sending data in json format so
+                    // we have to add Gson converter factory
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build())
+                    // at last we are building our retrofit builder.
+                    .build();
+            // below line is to create an instance for our APIInterface api class.
+            APIInterface retrofitAPI = retrofit.create(APIInterface.class);
 
 
-        // calling a method to create a post and passing our modal class.
-        Call<Void> call = retrofitAPI.sendData(mAPIKey,mRequestModal);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                Log.i("API", response.code()+" "+call.request().body()+" "+call.request().headers().toString());
-                if (response.code() == 200) {
-                   responseCallback.onSuccess();
+            // calling a method to create a post and passing our modal class.
+            Call<Void> call = retrofitAPI.sendData(mApiKey, mRequestModal);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    Log.i("API", response.code() + " " + call.request().body() + " " + call.request().headers().toString());
+                    if (response.code() == 200) {
+                        responseCallback.onSuccess();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("API", t.getMessage()+" "+call.request().url());
-                responseCallback.onFailure(t.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("API", t.getMessage() + " " + call.request().url());
+                    responseCallback.onFailure(t.getMessage());
+                }
+            });
+        } else {
+            responseCallback.onFailure("API key is not assigned");
+        }
     }
+
+    private enum Type {TRANSACTION, USER_SIGNUP}
 }

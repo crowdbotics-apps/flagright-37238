@@ -149,15 +149,18 @@ public class MainActivity extends AppCompatActivity {
                 .append(flagrightDeviceMetricsSDK.getFingerprint()));
         System.out.println("FingerPrint: "+ flagrightDeviceMetricsSDK.getFingerprint());
 
-        FlagrightDeviceMetricsSDK.getInstance().init(this, "123", "1234", null, new ResponseCallback() {
+        flagrightDeviceMetricsSDK.init( "123", "");
+        flagrightDeviceMetricsSDK.emit(this, "1234", null,
+                new ResponseCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(MainActivity.this, "Data uploaded successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                Log.e("Error", errorMessage);
             }
         });
     }
