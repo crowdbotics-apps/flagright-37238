@@ -7,6 +7,7 @@ import {
   Platform,
   PermissionsAndroid,
   SafeAreaView,
+  Button,
 } from 'react-native';
 import {
   getDeviceId,
@@ -198,6 +199,16 @@ export default function App() {
           <Text>Total External Storage: NA</Text>
         )}
         <Text>UnqiueId: {deviceId}</Text>
+        {/* <Button
+          title="call"
+          onPress={() => {
+            init('123', '1234')
+              .then(() => {
+                console.log('Data submitted successfully');
+              })
+              .catch((error) => console.log('Error', error));
+          }}
+        /> */}
       </View>
     </SafeAreaView>
   );
