@@ -25,9 +25,10 @@ import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
-import com.flagright.sdk.models.RequestModal;
-import com.google.gson.Gson;
 import com.scottyab.rootbeer.RootBeer;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
@@ -37,7 +38,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,11 +51,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FlagrightDeviceMetricsSDK {
     private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
     private static FlagrightDeviceMetricsSDK mFlagrightDeviceMetricsSDK;
-    private static RequestModal mRequestModal;
+    //    private static RequestModal mRequestModal;
     private static String mApiKey;
     private static String mRegion;
 
-    ;
 
     /**
      * Private constructor for singleton
@@ -67,7 +69,7 @@ public class FlagrightDeviceMetricsSDK {
      */
     public static FlagrightDeviceMetricsSDK getInstance() {
         if (mFlagrightDeviceMetricsSDK == null) {
-            mRequestModal = new RequestModal();
+//            mRequestModal = new RequestModal();
             mFlagrightDeviceMetricsSDK = new FlagrightDeviceMetricsSDK();
         }
         return mFlagrightDeviceMetricsSDK;
@@ -86,86 +88,91 @@ public class FlagrightDeviceMetricsSDK {
     /**
      * This method needs to call after the init method. This method gets all the required
      * attributes from device and then call the
-     * {@link #submitInfo(Context, ResponseCallback) submitInfo} method
+     * {@link #submitInfo(Context, ResponseCallback, JSONObject) submitInfo} method
      *
-     * @param context
-     * @param userId
-     * @param transactionId
-     * @param responseCallback
+     * @param context Application context
+     * @param userId user id
+     * @param transactionId transaction id
+     * @param responseCallback callback that inform success and failure
      */
     public void emit(Context context, String userId, String transactionId, ResponseCallback responseCallback) {
-        mRequestModal.setUserId(userId);
-        mRequestModal.setType(transactionId == null ? Type.USER_SIGNUP.name() : Type.TRANSACTION.name());
-        if (transactionId != null) {
-            mRequestModal.setTransactionId(transactionId);
+        JSONObject requestJsonObject = new JSONObject();
+        try {
+            requestJsonObject.put("userId", userId);
+            requestJsonObject.put("type", transactionId == null ? Type.USER_SIGNUP.name() :
+                    Type.TRANSACTION.name());
+            requestJsonObject.put("timestamp", System.currentTimeMillis());
+            if (transactionId != null) {
+                requestJsonObject.put("transactionId", transactionId);
+            }
+            requestJsonObject.put("deviceFingerprint", getFingerprint());
+            requestJsonObject.put("isVirtualDevice", isEmulator());
+            String ipAddress4 = getIPAddress(true);
+            if (ipAddress4 != null)
+                requestJsonObject.put("ipAddress", getIPAddress(true));
+            int totalContacts = fetchContactsCount(context);
+            // -1 means permission not granted
+            if (totalContacts != -1)
+                requestJsonObject.put("totalNumberOfContacts", totalContacts);
+            requestJsonObject.put("batteryLevel", getBatteryLevel(context).getLevel());
+            double totalExternalStorage = getExternalSdCardSize((false));
+            if (totalExternalStorage != 0) {
+                requestJsonObject.put("externalTotalStorageInGb", totalExternalStorage);
+                // check for free external storage
+                requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)));
+            }
+            requestJsonObject.put("manufacturer", getManufactureName());
+            double mainTotalStorage = getTotalInternalStorage();
+            if (mainTotalStorage !=0) {
+                requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage);
+            }
+            requestJsonObject.put("model", getModalName());
+            // operating system object
+            JSONObject osObject = new JSONObject();
+            osObject.put("name", "Android");
+            osObject.put("version", getOSVersion());
+            requestJsonObject.put("operatingSystem", osObject);
+            requestJsonObject.put("deviceCountryCode", getDeviceLocaleCountry());
+            requestJsonObject.put("deviceLaungageCode", getDeviceLocaleLanguageCode());
+            requestJsonObject.put("ramInGb", getRamSize(context));
+            requestJsonObject.put("isDataRoamingEnabled", isDataRoamingEnabled(context));
+            requestJsonObject.put("isLocationEnabled", isLocationEnabled(context));
+            requestJsonObject.put("isAccessibilityEnabled", isAccessibilityEnabled(context));
+            requestJsonObject.put("isBluetoothActive", isBluetoothEnabled().isEnable());
+            requestJsonObject.put("networkOperator", getNetworkOperatorName(context));
+
+            // for location
+            fetchCurrentLocation(context, new LocationFoundCallback() {
+                @Override
+                public void locationFound(Location location) {
+                    try {
+                        JSONObject locationObject = new JSONObject();
+                        locationObject.put("latitude", location.getLatitude());
+                        locationObject.put("longitude", location.getLongitude());
+                        requestJsonObject.put("location", locationObject);
+                    } catch (JSONException ex) {
+                        ex.printStackTrace();
+                    }
+                    submitInfo(context, responseCallback, requestJsonObject);
+                }
+
+                @Override
+                public void locationError(String error) {
+                    submitInfo(context, responseCallback, requestJsonObject);
+                }
+            });
+        } catch (JSONException ex) {
+            responseCallback.onFailure(ex.getMessage());
         }
-        mRequestModal.setTimestamp(System.currentTimeMillis());
-        mRequestModal.setDeviceLaungageCode(getDeviceLocaleLanguageCode());
-        mRequestModal.setDeviceFingerprint(getFingerprint());
-        mRequestModal.setVirtualDevice(isEmulator());
-        mRequestModal.setIpAddress(getIPAddress(true));
-        mRequestModal.setTotalNumberOfContacts(fetchContactsCount(context));
-        mRequestModal.setBatteryLevel(getBatteryLevel(context).getLevel());
-        mRequestModal.setExternalTotalStorageInGb(getExternalSdCardSize(false));
-        mRequestModal.setExternalFreeStorageInGb(getExternalSdCardSize(true));
-        mRequestModal.setManufacturer(getManufactureName());
-        mRequestModal.setMainTotalStorageInGb(getTotalInternalStorage());
-        mRequestModal.setModel(getModalName());
-        RequestModal.OperatingSystem operatingSystem = new RequestModal.OperatingSystem();
-        operatingSystem.setName(getOSName());
-        operatingSystem.setVersion(getOSVersion());
-        mRequestModal.setOperatingSystem(operatingSystem);
-        mRequestModal.setDeviceCountryCode(getDeviceLocaleCountry());
-        mRequestModal.setRamInGb(getRamSize(context));
-        mRequestModal.setDataRoamingEnabled(isDataRoamingEnabled(context));
-        mRequestModal.setLocationEnabled(isLocationEnabled(context));
-        mRequestModal.setAccessibilityEnabled(isAccessibilityEnabled(context));
-        mRequestModal.setBluetoothActive(isBluetoothEnabled().isEnable());
-        mRequestModal.setNetworkOperator(getNetworkOperatorName(context));
-
-        // for location
-        fetchCurrentLocation(context, new LocationFoundCallback() {
-            @Override
-            public void locationFound(Location location) {
-                RequestModal.Location loc = new RequestModal.Location();
-                loc.setLatitude(location.getLatitude());
-                loc.setLongitude(location.getLongitude());
-                mRequestModal.setLocation(loc);
-                submitInfo(context, responseCallback);
-            }
-
-            @Override
-            public void locationError(String error) {
-                Gson gson = new Gson();
-                System.out.println("RequestModal " + gson.toJson(mRequestModal).toString());
-                submitInfo(context, responseCallback);
-            }
-        });
     }
 
     /**
      * Method checks if the application is running on a real device or not
      *
-     * @return
+     * @return true if the app is running on the emulator
      */
     public boolean isEmulator() {
-        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                || Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.HARDWARE.contains("goldfish")
-                || Build.HARDWARE.contains("ranchu")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || Build.PRODUCT.contains("sdk_google")
-                || Build.PRODUCT.contains("google_sdk")
-                || Build.PRODUCT.contains("sdk")
-                || Build.PRODUCT.contains("sdk_x86")
-                || Build.PRODUCT.contains("sdk_gphone64_arm64")
-                || Build.PRODUCT.contains("vbox86p")
-                || Build.PRODUCT.contains("emulator")
-                || Build.PRODUCT.contains("simulator");
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) || Build.FINGERPRINT.startsWith("generic") || Build.FINGERPRINT.startsWith("unknown") || Build.HARDWARE.contains("goldfish") || Build.HARDWARE.contains("ranchu") || Build.MODEL.contains("google_sdk") || Build.MODEL.contains("Emulator") || Build.MODEL.contains("Android SDK built for x86") || Build.MANUFACTURER.contains("Genymotion") || Build.PRODUCT.contains("sdk_google") || Build.PRODUCT.contains("google_sdk") || Build.PRODUCT.contains("sdk") || Build.PRODUCT.contains("sdk_x86") || Build.PRODUCT.contains("sdk_gphone64_arm64") || Build.PRODUCT.contains("vbox86p") || Build.PRODUCT.contains("emulator") || Build.PRODUCT.contains("simulator");
     }
 
     /**
@@ -183,13 +190,12 @@ public class FlagrightDeviceMetricsSDK {
                     if (!addr.isLoopbackAddress()) {
                         String sAddr = addr.getHostAddress();
                         //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
-                        boolean isIPv4 = sAddr.indexOf(':') < 0;
-
+                        boolean isIPv4 = (sAddr != null ? sAddr.indexOf(':') : 0) < 0;
                         if (useIPv4) {
-                            if (isIPv4)
-                                return sAddr;
+                            if (isIPv4) return sAddr;
                         } else {
                             if (!isIPv4) {
+                                assert sAddr != null;
                                 int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
                                 return delim < 0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
                             }
@@ -200,7 +206,7 @@ public class FlagrightDeviceMetricsSDK {
         } catch (Exception ex) {
             ex.printStackTrace();
         } // for now eat exceptions
-        return "";
+        return null;
     }
 
     /**
@@ -271,10 +277,7 @@ public class FlagrightDeviceMetricsSDK {
      * @param locationFoundCallback {@link LocationFoundCallback} it an interface that returns location on success otherwise error
      */
     public void fetchCurrentLocation(Context context, LocationFoundCallback locationFoundCallback) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationFetcher fetcher = new LocationFetcher();
             fetcher.init(context, locationFoundCallback);
         } else {
@@ -411,8 +414,7 @@ public class FlagrightDeviceMetricsSDK {
      * @return the RAM size in GB
      */
     public double getRamSize(Context context) {
-        ActivityManager activityManager =
-                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memoryInfo);
 
@@ -425,7 +427,7 @@ public class FlagrightDeviceMetricsSDK {
      * Check if the data roaming is enabled
      *
      * @param context Application context
-     * @return true if the data raoming is enabled
+     * @return true if the data raaming is enabled
      */
     public boolean isDataRoamingEnabled(Context context) {
 
@@ -447,10 +449,9 @@ public class FlagrightDeviceMetricsSDK {
      * @return true if the accessibility is enabled
      */
     public boolean isAccessibilityEnabled(Context context) {
-        boolean enabled = false;
+        boolean enabled;
         try {
-            enabled = Settings.Secure.getInt(context.getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED) == 1;
+            enabled = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED) == 1;
         } catch (Settings.SettingNotFoundException ex) {
             enabled = false;
         }
@@ -468,17 +469,13 @@ public class FlagrightDeviceMetricsSDK {
     public BluetoothResponseModal isBluetoothEnabled() {
         BluetoothResponseModal bluetoothResponseModal = new BluetoothResponseModal();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        // Bluetooth is not enabled :)
+        // Bluetooth is enabled
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
             bluetoothResponseModal.setEnable(false);
             bluetoothResponseModal.setErrorMessage("Device does not support bluetooth");
-        } else if (!mBluetoothAdapter.isEnabled()) {
-            // Bluetooth is not enabled :)
-            bluetoothResponseModal.setEnable(false);
-        } else {
-            // Bluetooth is enabled
-            bluetoothResponseModal.setEnable(true);
-        }
+        } else bluetoothResponseModal.setEnable(mBluetoothAdapter.isEnabled());
         return bluetoothResponseModal;
     }
 
@@ -498,6 +495,11 @@ public class FlagrightDeviceMetricsSDK {
         }
     }
 
+    /**
+     * Method gets the device fingerprint
+     *
+     * @return device fingerprint
+     */
     public String getFingerprint() {
         return Build.FINGERPRINT;
     }
@@ -508,7 +510,7 @@ public class FlagrightDeviceMetricsSDK {
      * @param context          Context of the Application
      * @param responseCallback {@link ResponseCallback}
      */
-    private void submitInfo(Context context, ResponseCallback responseCallback) {
+    private void submitInfo(Context context, ResponseCallback responseCallback, JSONObject requestJsonObject) {
         if (mApiKey != null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             // set your desired log level
@@ -518,12 +520,10 @@ public class FlagrightDeviceMetricsSDK {
 
             // on below line we are creating a retrofit
             // builder and passing our base url
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                     // as we are sending data in json format so
                     // we have to add Gson converter factory
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(httpClient.build())
+                    .addConverterFactory(GsonConverterFactory.create()).client(httpClient.build())
                     // at last we are building our retrofit builder.
                     .build();
             // below line is to create an instance for our APIInterface api class.
@@ -531,7 +531,9 @@ public class FlagrightDeviceMetricsSDK {
 
 
             // calling a method to create a post and passing our modal class.
-            Call<Void> call = retrofitAPI.sendData(mApiKey, mRequestModal);
+            RequestBody requestBody = RequestBody.create(MediaType.parse
+                    ("application/json; charset=utf-8"), requestJsonObject.toString());
+            Call<Void> call = retrofitAPI.sendData(mApiKey, requestBody);
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
