@@ -18,6 +18,7 @@ let networkInfo = CTTelephonyNetworkInfo()
 
 public class DataCollection: NSObject, CBCentralManagerDelegate{
     
+    var parameters: [String:Any]?
     var manager: CBCentralManager!
     var locationManager: LocationHandler!
     var checkLocationEnabled: Bool?
@@ -25,8 +26,8 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
     var latitude: Double?
     
     let deviceID:String = UIDevice.current.identifierForVendor!.uuidString
-    let language:String = NSLocale.current.languageCode ?? "Error getting language code"
-    let country:String = NSLocale.current.regionCode ?? "Error getting country code"
+    let language:String = NSLocale.current.languageCode ?? ""
+    let country:String = NSLocale.current.regionCode ?? ""
     let ram:Int = (Int(ProcessInfo.processInfo.physicalMemory) / (1024 * 1024 * 1024))
     let systemOS = "iOS"
     let systemVersion = UIDevice.current.systemVersion
@@ -72,13 +73,13 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
 
          if carrier1 != nil
          {
-             return carrier1 ?? "Error"
+             return carrier1 ?? ""
          }
          else if carrier2 != nil
          {
-            return carrier2 ?? "Error"
+            return carrier2 ?? ""
          }
-        return "Error getting carrier"
+        return ""
         
     }
     
@@ -223,7 +224,7 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
     }
     
     func ipAddressType() -> String{
-        let ipAddress:String = getIPAddress() ?? "0"
+        let ipAddress:String = getIPAddress()
         if let _ = IPv4Address(ipAddress) {
             return "valid IPv4 address"
         } else if let _ = IPv6Address(ipAddress) {
@@ -233,13 +234,13 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
         }
     }
     
-    func getIPAddress() -> String? {
+    func getIPAddress() -> String {
         var address : String?
 
         // Get list of all interfaces on the local machine:
         var ifaddr : UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddr) == 0 else { return nil }
-        guard let firstAddr = ifaddr else { return nil }
+        guard getifaddrs(&ifaddr) == 0 else { return "" }
+        guard let firstAddr = ifaddr else { return "" }
 
         // For each interface ...
         for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
@@ -268,7 +269,7 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
         }
         freeifaddrs(ifaddr)
 
-        return address ?? "IP Address fetch failed"
+        return address ?? ""
     }
     
     func currentTimestamp()-> Int
@@ -278,19 +279,15 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
             return Int(since1970 * 1000)
         }
     
-    public func apiCall(userId: String, type: String){
-        let parameters = [
+    public func emit(userId: String, type: String, transactionId:String = ""){
+          parameters = [
           "userId": userId,
           "timestamp": currentTimestamp(),
           "type": type,
-          "transactionId": "string",
+          "transactionId": transactionId,
           "deviceFingerprint": deviceID,
           "isVirtualDevice": isSimulator(),
-          "ipAddress": getIPAddress() ?? "Could not fetch IP",
-          "location": [
-            "latitude": latitude ?? 0.00,
-            "longitude": longitude ?? 0.00
-          ],
+          "ipAddress": getIPAddress(),
           "totalNumberOfContacts": getContacts(),
           "batteryLevel": getBattery(),
           "manufacturer": maker,
@@ -303,14 +300,26 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
           "deviceCountryCode": country,
           "deviceLaungageCode": language,
           "ramInGb": ram,
-          "isLocationEnabled": checkLocationEnabled ?? false,
           "isAccessibilityEnabled": checkAccessibilityEnabled(),
           "isBluetoothActive": manager.state == .poweredOn,
-          "networkOperator": carrier()
         ] as [String : Any]
-        print(parameters)
-        makePostRequest(userId: userId, type: type, parameterDict: parameters)
         
+        if checkLocationEnabled == true {
+            parameters?["isLocationEnabled"] = true
+            parameters?["location"] = ["latitude": latitude!,"longitude": longitude!]
+        }
+        
+        if carrier() != "" {
+            parameters?["networkOperator"] = carrier()
+        }
+        
+        print(parameters)
+        
+    }
+    
+    //change to init
+    public func `init`(apikey: String, region:String){
+        makePostRequest(apiKey: apikey, region: region, parameterDict: parameters ?? ["":""])
     }
  
 }

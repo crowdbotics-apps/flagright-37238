@@ -15,8 +15,12 @@ class ViewController: UIViewController
      override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
          
+         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+             DataCollection.shared.emit(userId: "1234", type: "USER_SIGNUP", transactionId: "999")
+         }
+         
          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-             DataCollection.shared.apiCall(userId: "1234", type: "USER_SIGNUP")
+         DataCollection.shared.`init`(apikey: "123", region: "INDIA")
          }
          
     }

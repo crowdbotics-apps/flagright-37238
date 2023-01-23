@@ -7,7 +7,7 @@
 
 import Foundation
 
-func makePostRequest(userId: String, type: String, parameterDict: [String:Any]){
+func makePostRequest(apiKey: String, region: String, parameterDict: [String:Any]){
 
 let headers = ["Content-Type": "application/json"]
 
@@ -17,7 +17,7 @@ let request = NSMutableURLRequest(url: NSURL(string: "https://stoplight.io/mocks
                                         cachePolicy: .useProtocolCachePolicy,
                                     timeoutInterval: 10.0)
 request.httpMethod = "POST"
-request.addValue("123", forHTTPHeaderField: "x-api-key")
+request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
 
 request.allHTTPHeaderFields = headers
 request.httpBody = postData! as Data
