@@ -25,6 +25,7 @@ import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
+import com.flagright.sdk.models.InitResponse;
 import com.scottyab.rootbeer.RootBeer;
 
 import org.json.JSONException;
@@ -79,10 +80,23 @@ public class FlagrightDeviceMetricsSDK {
      * Method accepted the API key which would be required for Server Authentication purpose
      *
      * @param apiKey API key required to authenticate FlagRight Server
+     * @param region Region is required by the API
      */
-    public void init(String apiKey, String region) {
-        mApiKey = apiKey;
-        mRegion = region;
+    public InitResponse init(String apiKey, String region) {
+        InitResponse initResponse = new InitResponse();
+        if (Validator.validateAPIKey(apiKey) && Validator.validateRegion(region)) {
+            mApiKey = apiKey;
+            mRegion = region;
+           initResponse.setSuccess(true);
+        } else {
+            initResponse.setSuccess(false);
+            if (!Validator.validateAPIKey(apiKey)) {
+               initResponse.setError("Please add valid apiKey");
+            } else {
+                initResponse.setError("Please add valid region");
+            }
+        }
+        return initResponse;
     }
 
     /**
@@ -96,73 +110,83 @@ public class FlagrightDeviceMetricsSDK {
      * @param responseCallback callback that inform success and failure
      */
     public void emit(Context context, String userId, String transactionId, ResponseCallback responseCallback) {
-        JSONObject requestJsonObject = new JSONObject();
-        try {
-            requestJsonObject.put("userId", userId);
-            requestJsonObject.put("type", transactionId == null ? Type.USER_SIGNUP.name() :
-                    Type.TRANSACTION.name());
-            requestJsonObject.put("timestamp", System.currentTimeMillis());
-            if (transactionId != null) {
-                requestJsonObject.put("transactionId", transactionId);
-            }
-            requestJsonObject.put("deviceFingerprint", getFingerprint());
-            requestJsonObject.put("isVirtualDevice", isEmulator());
-            String ipAddress4 = getIPAddress(true);
-            if (ipAddress4 != null)
-                requestJsonObject.put("ipAddress", getIPAddress(true));
-            int totalContacts = fetchContactsCount(context);
-            // -1 means permission not granted
-            if (totalContacts != -1)
-                requestJsonObject.put("totalNumberOfContacts", totalContacts);
-            requestJsonObject.put("batteryLevel", getBatteryLevel(context).getLevel());
-            double totalExternalStorage = getExternalSdCardSize((false));
-            if (totalExternalStorage != 0) {
-                requestJsonObject.put("externalTotalStorageInGb", totalExternalStorage);
-                // check for free external storage
-                requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)));
-            }
-            requestJsonObject.put("manufacturer", getManufactureName());
-            double mainTotalStorage = getTotalInternalStorage();
-            if (mainTotalStorage !=0) {
-                requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage);
-            }
-            requestJsonObject.put("model", getModalName());
-            // operating system object
-            JSONObject osObject = new JSONObject();
-            osObject.put("name", "Android");
-            osObject.put("version", getOSVersion());
-            requestJsonObject.put("operatingSystem", osObject);
-            requestJsonObject.put("deviceCountryCode", getDeviceLocaleCountry());
-            requestJsonObject.put("deviceLaungageCode", getDeviceLocaleLanguageCode());
-            requestJsonObject.put("ramInGb", getRamSize(context));
-            requestJsonObject.put("isDataRoamingEnabled", isDataRoamingEnabled(context));
-            requestJsonObject.put("isLocationEnabled", isLocationEnabled(context));
-            requestJsonObject.put("isAccessibilityEnabled", isAccessibilityEnabled(context));
-            requestJsonObject.put("isBluetoothActive", isBluetoothEnabled().isEnable());
-            requestJsonObject.put("networkOperator", getNetworkOperatorName(context));
+        if (Validator.validateUserId(userId) && Validator.validateContext(context) && Validator.validateOnSuccessListener(responseCallback)) {
+            JSONObject requestJsonObject = new JSONObject();
+            try {
+                requestJsonObject.put("userId", userId);
+                requestJsonObject.put("type", transactionId == null ? Type.USER_SIGNUP.name() :
+                        Type.TRANSACTION.name());
+                requestJsonObject.put("timestamp", System.currentTimeMillis());
+                if (transactionId != null) {
+                    requestJsonObject.put("transactionId", transactionId);
+                }
+                requestJsonObject.put("deviceFingerprint", getFingerprint());
+                requestJsonObject.put("isVirtualDevice", isEmulator());
+                String ipAddress4 = getIPAddress(true);
+                if (ipAddress4 != null)
+                    requestJsonObject.put("ipAddress", getIPAddress(true));
+                int totalContacts = fetchContactsCount(context);
+                // -1 means permission not granted
+                if (totalContacts != -1)
+                    requestJsonObject.put("totalNumberOfContacts", totalContacts);
+                requestJsonObject.put("batteryLevel", getBatteryLevel(context).getLevel());
+                double totalExternalStorage = getExternalSdCardSize((false));
+                if (totalExternalStorage != 0) {
+                    requestJsonObject.put("externalTotalStorageInGb", totalExternalStorage);
+                    // check for free external storage
+                    requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)));
+                }
+                requestJsonObject.put("manufacturer", getManufactureName());
+                double mainTotalStorage = getTotalInternalStorage();
+                if (mainTotalStorage != 0) {
+                    requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage);
+                }
+                requestJsonObject.put("model", getModalName());
+                // operating system object
+                JSONObject osObject = new JSONObject();
+                osObject.put("name", "Android");
+                osObject.put("version", getOSVersion());
+                requestJsonObject.put("operatingSystem", osObject);
+                requestJsonObject.put("deviceCountryCode", getDeviceLocaleCountry());
+                requestJsonObject.put("deviceLaungageCode", getDeviceLocaleLanguageCode());
+                requestJsonObject.put("ramInGb", getRamSize(context));
+                requestJsonObject.put("isDataRoamingEnabled", isDataRoamingEnabled(context));
+                requestJsonObject.put("isLocationEnabled", isLocationEnabled(context));
+                requestJsonObject.put("isAccessibilityEnabled", isAccessibilityEnabled(context));
+                requestJsonObject.put("isBluetoothActive", isBluetoothEnabled().isEnable());
+                requestJsonObject.put("networkOperator", getNetworkOperatorName(context));
 
-            // for location
-            fetchCurrentLocation(context, new LocationFoundCallback() {
-                @Override
-                public void locationFound(Location location) {
-                    try {
-                        JSONObject locationObject = new JSONObject();
-                        locationObject.put("latitude", location.getLatitude());
-                        locationObject.put("longitude", location.getLongitude());
-                        requestJsonObject.put("location", locationObject);
-                    } catch (JSONException ex) {
-                        ex.printStackTrace();
+                // for location
+                fetchCurrentLocation(context, new LocationFoundCallback() {
+                    @Override
+                    public void locationFound(Location location) {
+                        try {
+                            JSONObject locationObject = new JSONObject();
+                            locationObject.put("latitude", location.getLatitude());
+                            locationObject.put("longitude", location.getLongitude());
+                            requestJsonObject.put("location", locationObject);
+                        } catch (JSONException ex) {
+                            ex.printStackTrace();
+                        }
+                        submitInfo(context, responseCallback, requestJsonObject);
                     }
-                    submitInfo(context, responseCallback, requestJsonObject);
-                }
 
-                @Override
-                public void locationError(String error) {
-                    submitInfo(context, responseCallback, requestJsonObject);
-                }
-            });
-        } catch (JSONException ex) {
-            responseCallback.onFailure(ex.getMessage());
+                    @Override
+                    public void locationError(String error) {
+                        submitInfo(context, responseCallback, requestJsonObject);
+                    }
+                });
+            } catch (JSONException ex) {
+                responseCallback.onFailure(ex.getMessage());
+            }
+        }else {
+            if (!Validator.validateContext(context))
+            responseCallback.onFailure("Context is not valid");
+            else if (!Validator.validateUserId(userId))
+                responseCallback.onFailure("User Id is not valid");
+            else if (!Validator.validateOnSuccessListener(responseCallback)) {
+                Log.e("Error", "Please pass the Valid onSuccess listener");
+            }
         }
     }
 
@@ -511,7 +535,7 @@ public class FlagrightDeviceMetricsSDK {
      * @param responseCallback {@link ResponseCallback}
      */
     private void submitInfo(Context context, ResponseCallback responseCallback, JSONObject requestJsonObject) {
-        if (mApiKey != null) {
+        if (Validator.validateAPIKey(mApiKey)) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             // set your desired log level
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);

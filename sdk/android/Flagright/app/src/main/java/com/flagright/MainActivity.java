@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.flagright.sdk.FlagrightDeviceMetricsSDK;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
+import com.flagright.sdk.models.InitResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,20 +150,22 @@ public class MainActivity extends AppCompatActivity {
                 .append(flagrightDeviceMetricsSDK.getFingerprint()));
         System.out.println("FingerPrint: "+ flagrightDeviceMetricsSDK.getFingerprint());
 
-        flagrightDeviceMetricsSDK.init( "123", "");
-        flagrightDeviceMetricsSDK.emit(this, "1234", null,
-                new ResponseCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
-                                Toast.LENGTH_SHORT).show();
-                    }
+        InitResponse initResponse = flagrightDeviceMetricsSDK.init("123", "region");
+        if (initResponse.isSuccess()) {
+            flagrightDeviceMetricsSDK.emit(this, "1234", null,
+                    new ResponseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(MainActivity.this, "Attributes uploaded successfully",
+                                    Toast.LENGTH_SHORT).show();
+                        }
 
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        Log.e("Error", errorMessage);
-                    }
-                });
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            Log.e("Error", errorMessage);
+                        }
+                    });
+        }
     }
 
     private void requestAppPermissions() {
