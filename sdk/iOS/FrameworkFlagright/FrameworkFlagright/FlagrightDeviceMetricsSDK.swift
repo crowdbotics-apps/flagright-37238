@@ -16,7 +16,7 @@ import CoreBluetooth
 
 let networkInfo = CTTelephonyNetworkInfo()
 
-public class DataCollection: NSObject, CBCentralManagerDelegate{
+public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate{
     
     var parameters: [String:Any]?
     var manager: CBCentralManager!
@@ -46,8 +46,8 @@ public class DataCollection: NSObject, CBCentralManagerDelegate{
     
 // Singleton instance of DataCollections. Initiates all the attributes and should be called in App Delegate
     
-    public static let shared = { () -> DataCollection in
-        let instance = DataCollection()
+    public static let shared = { () -> FlagrightDeviceMetricsSDK in
+        let instance = FlagrightDeviceMetricsSDK()
         return instance
     } ()
     

@@ -16,11 +16,11 @@ class ViewController: UIViewController
         super.viewWillAppear(animated)
          
          DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-             DataCollection.shared.emit(userId: "1234", type: "USER_SIGNUP", transactionId: "999")
+             FlagrightDeviceMetricsSDK.shared.emit(userId: "1234", type: "USER_SIGNUP", transactionId: "999")
          }
          
          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-         DataCollection.shared.`init`(apikey: "123", region: "INDIA")
+             FlagrightDeviceMetricsSDK.shared.`init`(apikey: "123", region: "INDIA")
          }
          
     }
