@@ -34,7 +34,10 @@ FlagrightDeviceMetricsSDK flagrightDeviceMetricsSDK = FlagrightDeviceMetricsSDK.
 ```
 ##### after getting the instance call the init method
 ```bash
-flagrightDeviceMetricsSDK.init( "123", "");
+InitResponse initResponse = flagrightDeviceMetricsSDK.init( "123", "");
+ if (initResponse.isSuccess()) {
+    // now the app is ready to call the emit method
+ }
 ```
 #### and then call emit method to send all the fetched attributes over Flagright server
 ```bash
@@ -52,7 +55,7 @@ flagrightDeviceMetricsSDK.emit(this, "1234", null,
                     }
                 });
 ```
-
+You can find the example app from this [link](https://github.com/crowdbotics-apps/flagright-37238/tree/master/sdk/android/Flagright).
 ## Methods
 | Method | Description |
 | ------ | ------ |
