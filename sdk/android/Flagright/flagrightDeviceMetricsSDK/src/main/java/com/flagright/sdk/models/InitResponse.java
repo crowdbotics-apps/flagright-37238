@@ -1,5 +1,8 @@
 package com.flagright.sdk.models;
 
+/**
+ *  Response Object of init method
+ */
 public class InitResponse {
     private boolean success;
     private String error;

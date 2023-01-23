@@ -26,6 +26,7 @@ import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
 import com.flagright.sdk.models.InitResponse;
+import com.flagright.sdk.models.Region;
 import com.scottyab.rootbeer.RootBeer;
 
 import org.json.JSONException;
@@ -50,11 +51,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlagrightDeviceMetricsSDK {
-    private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
+    private enum Type {TRANSACTION, USER_SIGNUP}
+    private static final String BASE_URL =  "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
     private static FlagrightDeviceMetricsSDK mFlagrightDeviceMetricsSDK;
     //    private static RequestModal mRequestModal;
     private static String mApiKey;
-    private static String mRegion;
+    private static Region mRegion;
 
 
     /**
@@ -80,13 +82,14 @@ public class FlagrightDeviceMetricsSDK {
      * Method accepted the API key which would be required for Server Authentication purpose
      *
      * @param apiKey API key required to authenticate FlagRight Server
-     * @param region Region is required by the API
+     * @param region Region  is required by the API
      */
-    public InitResponse init(String apiKey, String region) {
+    public InitResponse init(String apiKey, Region region) {
         InitResponse initResponse = new InitResponse();
         if (Validator.validateAPIKey(apiKey) && Validator.validateRegion(region)) {
             mApiKey = apiKey;
             mRegion = region;
+            Log.i("Region", region.toString());
            initResponse.setSuccess(true);
         } else {
             initResponse.setSuccess(false);
@@ -579,5 +582,4 @@ public class FlagrightDeviceMetricsSDK {
         }
     }
 
-    private enum Type {TRANSACTION, USER_SIGNUP}
 }

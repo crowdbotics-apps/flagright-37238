@@ -16,6 +16,7 @@ import com.flagright.sdk.FlagrightDeviceMetricsSDK;
 import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.InitResponse;
+import com.flagright.sdk.models.Region;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 .append(flagrightDeviceMetricsSDK.getFingerprint()));
         System.out.println("FingerPrint: "+ flagrightDeviceMetricsSDK.getFingerprint());
 
-        InitResponse initResponse = flagrightDeviceMetricsSDK.init("123", "region");
+        InitResponse initResponse = flagrightDeviceMetricsSDK.init("123", Region.US1);
         if (initResponse.isSuccess()) {
             flagrightDeviceMetricsSDK.emit(this, "1234", null,
                     new ResponseCallback() {

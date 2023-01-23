@@ -1,9 +1,11 @@
 package com.flagright.sdk;
 
+import com.flagright.sdk.models.Region;
+
 import junit.framework.TestCase;
 
 /**
- * Unit test cases for
+ * Unit test cases for FlagrightDeviceMetricsSDK
  */
 public class FlagrightDeviceMetricsSDKTest extends TestCase {
 
@@ -24,19 +26,12 @@ public class FlagrightDeviceMetricsSDKTest extends TestCase {
     }
 
     public void testRegionValidatorCorrectValue() {
-        assertTrue(Validator.validateRegion("region"));
+        Region region = Region.ASIA1;
+        assertTrue(Validator.validateRegion(region));
     }
 
     public void testRegionValidatorNullValue() {
         assertFalse(Validator.validateRegion(null));
-    }
-
-    public void testRegionValidatorEmptyValue() {
-        assertFalse(Validator.validateRegion(""));
-    }
-
-    public void testRegionValidatorEmptyWithSpaceValue() {
-        assertFalse(Validator.validateRegion("   "));
     }
 
     public void testUserIdValidatorCorrectValue() {

@@ -3,6 +3,7 @@ package com.flagright.sdk;
 import android.content.Context;
 
 import com.flagright.sdk.interfaces.ResponseCallback;
+import com.flagright.sdk.models.Region;
 
 /**
  * Class validates the integration calls
@@ -34,14 +35,26 @@ public class Validator {
      * @param region region
      * @return true if the region is valid
      */
-    public static boolean validateRegion(String region) {
-        return region != null && region.trim().length() > 0;
+    public static boolean validateRegion(Region region) {
+       return region!= null;
     }
 
+    /**
+     *  Validate context
+     *
+     * @param context Application Context
+     * @return true if valid context is pass
+     */
     public static boolean validateContext(Context context) {
         return context != null;
     }
 
+    /**
+     * Validate {@link ResponseCallback} as an argument
+     *
+     * @param responseCallback {@link ResponseCallback}
+     * @return true if valid {@link ResponseCallback} object is pass
+     */
     public static boolean validateOnSuccessListener(ResponseCallback responseCallback) {
        return responseCallback != null;
     }
