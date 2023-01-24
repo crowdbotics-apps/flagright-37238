@@ -1,4 +1,4 @@
-import { Region } from 'react-native-flagright-sdk';
+import { Region } from '../index';
 
 function validateString(str: string) {
   if (str && str.trim().length > 0) {
