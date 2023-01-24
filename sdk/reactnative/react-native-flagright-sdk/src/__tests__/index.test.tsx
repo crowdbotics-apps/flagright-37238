@@ -6,7 +6,7 @@ jest.mock('react-native-bluetooth-status', () => {});
 jest.mock('@react-native-async-storage/async-storage', () => {});
 
 import { validateUserId } from '../../src/util/Validator';
-import { emit, init, Region } from '../index';
+import { init, Region } from '../index';
 
 // for thie init method test please comment the setItem calls from the original method
 test('Call for init method for correct value', () => {

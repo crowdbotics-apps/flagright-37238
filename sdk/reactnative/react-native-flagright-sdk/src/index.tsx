@@ -65,6 +65,13 @@ export async function init(apiKey: string, region: Region): Promise<any> {
   }
 }
 
+/**
+ * Method gets all the required attribute and send them over server
+ *
+ * @param userId id of the user
+ * @param transactionId transaction id
+ * @returns
+ */
 export async function emit(
   userId: string,
   transactionId: string | undefined = undefined

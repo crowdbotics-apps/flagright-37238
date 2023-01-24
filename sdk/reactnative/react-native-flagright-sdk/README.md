@@ -1,6 +1,6 @@
 # react-native-flagright-sdk
 
-Flagright ReactNative SDK
+FlagrightDeviceMetric ReactNative SDK
 
 ## Installation
 
@@ -20,7 +20,7 @@ $ yarn install
 After this, install the following dependencies
 
 ```sh
-$ yarn add react-native-device-info react-native-bluetooth-status react-native-geolocation-service
+$ yarn add react-native-device-info react-native-bluetooth-status react-native-geolocation-service @react-native-async-storage/async-storage
 ```
 
 ## iOS
@@ -54,8 +54,6 @@ The locations and the read contact permissions are comes under the dangerous per
 
 ```js
 import { init, Region, emit } from 'react-native-flagright-sdk';
-
-// ...
 
 init('123', Region.US1)
   .then(() => {
