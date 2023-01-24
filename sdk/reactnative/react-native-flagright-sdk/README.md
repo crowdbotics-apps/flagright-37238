@@ -53,17 +53,31 @@ The locations and the read contact permissions are comes under the dangerous per
 ## Usage
 
 ```js
-import { init } from 'react-native-flagright-sdk';
+import { init, Region, emit } from 'react-native-flagright-sdk';
 
 // ...
 
-const result = await init('123', '1234');
+init('123', Region.US1)
+  .then(() => {
+    console.log('SDK initialize successfully');
+  })
+  .catch((er) => console.log('Error', er));
+```
+
+This is how the emit can be called following SDK initialization.
+
+```js
+emit('1234')
+  .then(() => console.log('Attributes uploaded successfully'))
+  .catch((e) => console.error('error', e));
 ```
 
 With transaction id
 
 ```js
-const result = await init('123', '1234', '12345678');
+emit('1234', '12111')
+  .then(() => console.log('Attributes uploaded successfully'))
+  .catch((e) => console.error('error', e));
 ```
 
 <!-- ## Contributing
