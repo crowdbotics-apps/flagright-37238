@@ -6,6 +6,12 @@ import type { BluetoothResponseType } from './types/BluetoothResponseModalType';
 import type { GeolocationType } from './types/GeolocationType';
 import type { LocationType, RequestType } from './types/RequestType';
 import { sendData } from './services/APIHandler';
+import {
+  validateAPIKey,
+  validateRegion,
+  validateUserId,
+} from './util/Validator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LINKING_ERROR =
   `The package 'react-native-flagright-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -24,66 +30,116 @@ const FlagrightSdk = NativeModules.FlagrightSdk
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return FlagrightSdk.multiply(a, b);
-}
-
 enum Type {
   TRANSACTION = 'TRANSACTION',
   USER_SIGNUP = 'USER_SIGNUP',
 }
 
-export async function init(
-  apiKey: string,
+/**
+ * Allowed Region
+ */
+export const enum Region {
+  US1 = 'us_1',
+  EU1 = 'eu_1',
+  EU2 = 'eu_2',
+  ASIA1 = 'asia_1',
+  ASIA2 = 'asia_2',
+}
+/**
+ * Method intitalize the SDK with api key and region
+ *
+ * @param apiKey apikey required for authentication
+ * @param region region required by API uel
+ * @returns success if assignement is successfull otherwise false
+ */
+export async function init(apiKey: string, region: Region): Promise<any> {
+  if (validateAPIKey(apiKey) && validateRegion(region)) {
+    await AsyncStorage.setItem('apiKey', apiKey);
+    await AsyncStorage.setItem('region', region);
+    return Promise.resolve();
+  } else {
+    if (!validateAPIKey(apiKey)) {
+      return Promise.reject('Please pass the valid APIkey');
+    }
+    return Promise.reject('Please pass the valid Region');
+  }
+}
+
+export async function emit(
   userId: string,
   transactionId: string | undefined = undefined
 ): Promise<any> {
-  let requestType: RequestType = {
-    userId,
-    type: transactionId ? Type.TRANSACTION : Type.USER_SIGNUP,
-    timestamp: Date.now(),
-  };
-  requestType.transactionId = transactionId;
+  let mApiKey = undefined;
   try {
-    requestType.deviceFingerprint = await getDeviceId();
-    requestType.isVirtualDevice = isEmulator();
-    requestType.ipAddress = await getIPAddress(true);
-    const geolocation = await getCurrentLocation();
-    if (geolocation.success) {
-      const location: LocationType = {
-        latitude: geolocation?.position?.coords?.latitude,
-        longitude: geolocation?.position?.coords?.longitude,
-      };
-      requestType.location = location;
-    }
-    requestType.totalNumberOfContacts = await fetchContactsCount();
-    requestType.batteryLevel = await getBatteryLevel();
-    if (requestType.batteryLevel > 0) {
-      requestType.batteryLevel = requestType.batteryLevel * 100;
-    }
-    requestType.externalTotalStorageInGb = await getExternalSdCardSize(false);
-    requestType.externalFreeStorageInGb = await getExternalSdCardSize(true);
-    requestType.manufacturer = getManufactureName();
-    requestType.mainTotalStorageInGb = getTotalInternalStorage();
-    requestType.model = getModalName();
-    requestType.operatingSystem = {
-      name: Platform.OS === 'ios' ? 'iOS' : 'Android',
-      version: getOSVersion(),
-    };
-    requestType.deviceCountryCode = await getDeviceLocaleCountry();
-    requestType.deviceLaungageCode = await getDeviceLocaleLanguageCode();
-    requestType.ramInGb = getRamSize();
-    requestType.isDataRoamingEnabled = await isDataRoamingEnabled();
-    requestType.isLocationEnabled = isLocationEnabled();
-    requestType.isAccessibilityEnabled = await isAccessibilityEnabled();
-    const bluetoothObj = await isBluetoothEnabled();
-    requestType.isBluetoothActive = bluetoothObj.enable;
-    requestType.networkOperator = getNetworkOperatorName();
-  } catch (ex) {
-    console.error('Error', ex);
+    mApiKey = await AsyncStorage.getItem('apiKey');
+  } catch (e) {
+    return Promise.reject(e);
   }
-  console.log('RequestParams', JSON.stringify(requestType));
-  return sendData(apiKey, requestType);
+  if (mApiKey) {
+    if (validateUserId(userId) && validateAPIKey(mApiKey)) {
+      let requestType: RequestType = {
+        userId,
+        type: transactionId ? Type.TRANSACTION : Type.USER_SIGNUP,
+        timestamp: Date.now(),
+      };
+      requestType.transactionId = transactionId;
+      try {
+        requestType.deviceFingerprint = await getDeviceId();
+        requestType.isVirtualDevice = isEmulator();
+        const ipAddress = await getIPAddress(true);
+        if (ipAddress) requestType.ipAddress = ipAddress;
+        const geolocation = await getCurrentLocation();
+        if (geolocation.success) {
+          const location: LocationType = {
+            latitude: geolocation?.position?.coords?.latitude,
+            longitude: geolocation?.position?.coords?.longitude,
+          };
+          requestType.location = location;
+        }
+        requestType.totalNumberOfContacts = await fetchContactsCount();
+        requestType.batteryLevel = await getBatteryLevel();
+        if (requestType.batteryLevel > 0) {
+          requestType.batteryLevel = requestType.batteryLevel * 100;
+        }
+        const externalStorageTotal = await getExternalSdCardSize(false);
+        if (externalStorageTotal != 0) {
+          requestType.externalTotalStorageInGb = await getExternalSdCardSize(
+            false
+          );
+          requestType.externalFreeStorageInGb = await getExternalSdCardSize(
+            true
+          );
+        }
+        requestType.manufacturer = getManufactureName();
+        requestType.mainTotalStorageInGb = getTotalInternalStorage();
+        requestType.model = getModalName();
+        requestType.operatingSystem = {
+          name: Platform.OS === 'ios' ? 'iOS' : 'Android',
+          version: getOSVersion(),
+        };
+        requestType.deviceCountryCode = await getDeviceLocaleCountry();
+        requestType.deviceLaungageCode = await getDeviceLocaleLanguageCode();
+        requestType.ramInGb = getRamSize();
+        requestType.isDataRoamingEnabled = await isDataRoamingEnabled();
+        requestType.isLocationEnabled = isLocationEnabled();
+        requestType.isAccessibilityEnabled = await isAccessibilityEnabled();
+        const bluetoothObj = await isBluetoothEnabled();
+        requestType.isBluetoothActive = bluetoothObj.enable;
+        requestType.networkOperator = getNetworkOperatorName();
+      } catch (ex) {
+        console.error('Error', ex);
+      }
+      // console.log('RequestParams', JSON.stringify(requestType));
+      return sendData(mApiKey, requestType);
+    } else {
+      if (!validateAPIKey(mApiKey)) {
+        return Promise.reject('Please pass the valid AppId');
+      }
+      return Promise.reject('Please pass the valid userId');
+    }
+  } else {
+    return Promise.reject('Please pass the valid AppId');
+  }
 }
 
 /**
@@ -198,27 +254,27 @@ export function getOSVersion() {
   return DeviceInfo.getSystemVersion();
 }
 
-export function getDeviceLocaleLanguageCode(): Promise<string> {
+export function getDeviceLocaleLanguageCode(): Promise<string | undefined> {
   try {
     return FlagrightSdk.getDeviceLocaleLanguageCode();
   } catch (ex) {
-    return new Promise((resolve) => resolve('NA'));
+    return new Promise((resolve) => resolve(undefined));
   }
 }
 
-export function getDeviceLocaleCountry(): Promise<string> {
+export function getDeviceLocaleCountry(): Promise<string | undefined> {
   try {
     return FlagrightSdk.getDeviceLocaleCountry();
   } catch (ex) {
-    return new Promise((resolve) => resolve('NA'));
+    return new Promise((resolve) => resolve(undefined));
   }
 }
 
-export function getDeviceTimeZone(): Promise<string> {
+export function getDeviceTimeZone(): Promise<string | undefined> {
   try {
     return FlagrightSdk.getDeviceTimeZone();
   } catch (ex) {
-    return new Promise((resolve) => resolve('NA'));
+    return new Promise((resolve) => resolve(undefined));
   }
 }
 
@@ -385,11 +441,11 @@ export function fetchContactsCount(): Promise<number> {
  */
 export function getExternalSdCardSize(
   forFreeStorage: boolean
-): Promise<number> {
+): Promise<number | undefined> {
   try {
     return FlagrightSdk.getExternalSdCardSize(forFreeStorage);
   } catch (ex) {
-    return new Promise((resolve) => resolve(0));
+    return new Promise((resolve) => resolve(undefined));
   }
 }
 
