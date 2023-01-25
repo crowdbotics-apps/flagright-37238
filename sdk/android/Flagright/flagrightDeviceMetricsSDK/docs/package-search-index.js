@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.flagright.sdk"},{"l":"com.flagright.sdk.interfaces"},{"l":"com.flagright.sdk.models"}]
