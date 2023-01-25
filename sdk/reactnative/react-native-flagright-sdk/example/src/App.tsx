@@ -34,6 +34,8 @@ import {
   fetchContactsCount,
   getExternalSdCardSize,
   init,
+  Region,
+  emit,
 } from 'react-native-flagright-sdk';
 import type { BluetoothResponseType } from 'src/types/BluetoothResponseModalType';
 import type { GeolocationType } from 'src/types/GeolocationType';
@@ -66,11 +68,15 @@ export default function App() {
   // const [fingerPrint, setFingerPrint] = React.useState<string | undefined>();
 
   React.useEffect(() => {
-    init('123', '1234')
+    init('123', Region.US1)
       .then(() => {
-        console.log('Data submitted successfully');
+        // emit('1234').then(() => console.log('SDK initialize successfully'));
       })
-      .catch((error) => console.log('Error', error));
+      .catch((er) => console.log('Error', er));
+
+    emit('1234')
+      .then(() => console.log('Attributes uploaded successfully'))
+      .catch((e) => console.error('error', e));
 
     getDeviceId().then((id) => setDeviceId(id));
     getDeviceLocaleLanguageCode().then((code) => setLanguageCode(code));
@@ -198,6 +204,16 @@ export default function App() {
           <Text>Total External Storage: NA</Text>
         )}
         <Text>UnqiueId: {deviceId}</Text>
+        {/* <Button
+          title="call"
+          onPress={() => {
+            init('123', '1234')
+              .then(() => {
+                console.log('Data submitted successfully');
+              })
+              .catch((error) => console.log('Error', error));
+          }}
+        /> */}
       </View>
     </SafeAreaView>
   );
