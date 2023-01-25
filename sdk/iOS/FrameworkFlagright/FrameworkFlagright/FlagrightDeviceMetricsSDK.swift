@@ -12,53 +12,97 @@ import ContactsUI
 import CoreTelephony
 import Network
 import LocalAuthentication
-
-
+import CoreBluetooth
 
 let networkInfo = CTTelephonyNetworkInfo()
 
-public class DataCollection{
+public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate{
     
-    public init() {
-    }
-     
-    public let deviceID = UIDevice.current.identifierForVendor!.uuidString
-    public let language = NSLocale.current.languageCode
-    public let country = NSLocale.current.regionCode
-    public let ram = ProcessInfo.processInfo.physicalMemory
-    public let systemVersion = UIDevice.current.systemVersion
-    public let maker = "Apple"
-    public let modelName = UIDevice.modelName 
-
-    public let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
+    var parameters: [String:Any]?
+    var manager: CBCentralManager!
+    var locationManager: LocationHandler!
+    var checkLocationEnabled: Bool?
+    var longitude: Double?
+    var latitude: Double?
     
-    public let carrier:String? = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
+    let deviceID:String = UIDevice.current.identifierForVendor!.uuidString
+    let language:String = NSLocale.current.languageCode ?? ""
+    let country:String = NSLocale.current.regionCode ?? ""
+    let ram:Int = (Int(ProcessInfo.processInfo.physicalMemory) / (1024 * 1024 * 1024))
+    let systemOS = "iOS"
+    let systemVersion = UIDevice.current.systemVersion
+    let maker = "Apple"
+    let modelName = UIDevice.modelName
     
     let store = CNContactStore()
     let keysToFetch = [CNContactGivenNameKey]
     var contactArray = [String]()
+
+    let jailBreakStatus = UIDevice.isJailBroken(UIDevice.current)
+        
     
-    public func getContacts() -> Int{
+    private override init() {
+    }
+    
+// Singleton instance of DataCollections. Initiates all the attributes and should be called in App Delegate
+    
+    public static let shared = { () -> FlagrightDeviceMetricsSDK in
+        let instance = FlagrightDeviceMetricsSDK()
+        return instance
+    } ()
+    
+    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+
+    }
+    
+    
+    public func sync(){
+
+        self.manager = CBCentralManager(delegate: self, queue: nil)
+        locationManager = LocationHandler()
+        locationManager.determineMyCurrentLocation()
+        checkLocationEnabled = locationManager.isLocationEnabled()
+        longitude = locationManager.getLongitude()
+        latitude = locationManager.getLatitude()
+    
+}
+    
+    func carrier() -> String {
+        let carrier1  = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
+        let carrier2 = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.reversed().first?.value.carrierName
+
+         if carrier1 != nil
+         {
+             return carrier1 ?? ""
+         }
+         else if carrier2 != nil
+         {
+            return carrier2 ?? ""
+         }
+        return ""
+        
+    }
+    
+    func getContacts() -> Int{
     do {
          try store.enumerateContacts(with: CNContactFetchRequest.init(keysToFetch: keysToFetch as [CNKeyDescriptor]), usingBlock: { (contact, pointer) -> Void in
-            // print("contact = ","\(contact.givenName)")
              self.contactArray.append(contact.givenName)
          })
      } catch {
          print("something wrong happened in fetching contacts")
      }
-        return self.contactArray.count
+        return contactArray.count
     }
        
-    public func isSimulator() -> String{
+    func isSimulator() -> Bool{
 #if targetEnvironment(simulator)
-  return "Simulator"
+  return true
 #else
-  return "Real Device"
+  return false
 #endif
     }
     
-   public func getBiometricSupported() -> String {
+    func getBiometricSupported() -> String {
         var biometricType: LABiometryType {
             let context = LAContext()
             var error: NSError?
@@ -85,7 +129,7 @@ public class DataCollection{
     }
     }
     
-    public func checkAccessibilityEnabled()->Bool{
+     func checkAccessibilityEnabled()->Bool{
         if UIAccessibility.isAssistiveTouchRunning{
             return true
         }
@@ -143,43 +187,31 @@ public class DataCollection{
         return false
     }
  
-    public func availableMemory(){
-    let fileURL = URL(fileURLWithPath: NSHomeDirectory() as String)
-    do {
-        let values = try fileURL.resourceValues(forKeys: [.volumeAvailableCapacityKey])
-        if let capacity = values.volumeAvailableCapacity{
-            print("Available capacity: \(capacity)")
-        } else {
-            print("Capacity is unavailable")
-        }
-    } catch {
-        print("Error retrieving capacity: \(error.localizedDescription)")
-    }
-    }
     
-    public func totalMemory(){
+    func totalMemory()-> Int{
     let fileURL = URL(fileURLWithPath: NSHomeDirectory() as String)
     do {
         let values = try fileURL.resourceValues(forKeys: [.volumeTotalCapacityKey])
         if let capacity = values.volumeTotalCapacity {
-            print("Total capacity: \(capacity)")
+            return (capacity / (1024 * 1024 * 1024))
         } else {
             print("Capacity is unavailable")
         }
     } catch {
         print("Error retrieving capacity: \(error.localizedDescription)")
     }
+        return 0
     }
     
-    public var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
+     var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
     
-    public func getBattery()->Float{
+     func getBattery()->Int{
         UIDevice.current.isBatteryMonitoringEnabled = true
         let level = UIDevice.current.batteryLevel
-        return level
+        return Int(level*100)
     }
     
-    public var isConnectedToVpn: Bool {
+    var isConnectedToVpn: Bool {
         if let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? Dictionary<String, Any>,
             let scopes = settings["__SCOPED__"] as? [String:Any] {
             for (key, _) in scopes {
@@ -191,8 +223,8 @@ public class DataCollection{
         return false
     }
     
-    public func ipAddressType() -> String{
-        let ipAddress:String = getIPAddress() ?? "0"
+    func ipAddressType() -> String{
+        let ipAddress:String = getIPAddress()
         if let _ = IPv4Address(ipAddress) {
             return "valid IPv4 address"
         } else if let _ = IPv6Address(ipAddress) {
@@ -202,13 +234,13 @@ public class DataCollection{
         }
     }
     
-    func getIPAddress() -> String? {
+    func getIPAddress() -> String {
         var address : String?
 
         // Get list of all interfaces on the local machine:
         var ifaddr : UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddr) == 0 else { return nil }
-        guard let firstAddr = ifaddr else { return nil }
+        guard getifaddrs(&ifaddr) == 0 else { return "" }
+        guard let firstAddr = ifaddr else { return "" }
 
         // For each interface ...
         for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
@@ -237,6 +269,57 @@ public class DataCollection{
         }
         freeifaddrs(ifaddr)
 
-        return address
+        return address ?? ""
     }
+    
+    func currentTimestamp()-> Int
+        {
+            let currentDate = Date()
+            let since1970 = currentDate.timeIntervalSince1970
+            return Int(since1970 * 1000)
+        }
+    
+    public func emit(userId: String, type: String, transactionId:String = ""){
+          parameters = [
+          "userId": userId,
+          "timestamp": currentTimestamp(),
+          "type": type,
+          "transactionId": transactionId,
+          "deviceFingerprint": deviceID,
+          "isVirtualDevice": isSimulator(),
+          "ipAddress": getIPAddress(),
+          "totalNumberOfContacts": getContacts(),
+          "batteryLevel": getBattery(),
+          "manufacturer": maker,
+          "mainTotalStorageInGb": totalMemory(),
+          "model": modelName,
+          "operatingSystem": [
+            "name": systemOS,
+            "version": systemVersion
+          ],
+          "deviceCountryCode": country,
+          "deviceLaungageCode": language,
+          "ramInGb": ram,
+          "isAccessibilityEnabled": checkAccessibilityEnabled(),
+          "isBluetoothActive": manager.state == .poweredOn,
+        ] as [String : Any]
+        
+        if checkLocationEnabled == true {
+            parameters?["isLocationEnabled"] = true
+            parameters?["location"] = ["latitude": latitude!,"longitude": longitude!]
+        }
+        
+        if carrier() != "" {
+            parameters?["networkOperator"] = carrier()
+        }
+        
+        print(parameters)
+        
+    }
+    
+    //change to init
+    public func `init`(apikey: String, region:String){
+        makePostRequest(apiKey: apikey, region: region, parameterDict: parameters ?? ["":""])
+    }
+ 
 }
