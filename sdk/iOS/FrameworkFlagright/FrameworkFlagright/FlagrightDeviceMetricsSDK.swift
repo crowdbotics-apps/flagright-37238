@@ -315,6 +315,8 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate{
         
         print(parameters)
         
+        
+        
     }
     
     //change to init
