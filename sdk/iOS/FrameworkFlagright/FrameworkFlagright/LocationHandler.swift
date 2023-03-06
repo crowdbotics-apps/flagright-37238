@@ -9,14 +9,14 @@ import Foundation
 import CoreLocation
 
 public class LocationHandler: NSObject, CLLocationManagerDelegate{
-    
-var locationManager : CLLocationManager!
+
+var locationManager: CLLocationManager!
 
 public override init() {
         super.init()
         locationManager = CLLocationManager()
     }
-    
+
     public func determineMyCurrentLocation() {
              locationManager.delegate = self
              locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -27,27 +27,27 @@ public override init() {
                  locationManager.startUpdatingLocation()
              }
          }
-    
+
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-       let userLocation:CLLocation = locations[0] as CLLocation
+       let userLocation: CLLocation = locations[0] as CLLocation
 
        // Call stopUpdatingLocation() to stop listening for location updates,
        // other wise this function will be called every time when user location changes.
-    
+
       manager.stopUpdatingLocation()
 
    }
-    
-    public func getLongitude()->Double{
+
+    public func getLongitude() -> Double {
         let longitude = CLLocationManager().location?.coordinate.longitude ?? 0.00
         return longitude
     }
-    
-    public func getLatitude()->Double{
+
+    public func getLatitude() -> Double {
         let latitude = CLLocationManager().location?.coordinate.latitude ?? 0.00
         return latitude
     }
-    
+
     public func isLocationEnabled() -> Bool{
         switch CLLocationManager().authorizationStatus {
          case .notDetermined, .restricted, .denied:
@@ -66,3 +66,4 @@ public override init() {
    }
 
 }
+
