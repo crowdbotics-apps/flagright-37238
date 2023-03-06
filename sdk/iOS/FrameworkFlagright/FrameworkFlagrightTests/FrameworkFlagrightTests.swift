@@ -32,31 +32,31 @@ class FrameworkFlagrightTests: XCTestCase {
         sut = nil
     }
 
-    func testValidateDeviceFingerprint(){
+    func testValidateDeviceFingerprint() {
         let result = sut?.deviceID
         XCTAssertNotEqual(result, nil)
     }
 
-    func testValidateIpAddress(){
+    func testValidateIpAddress() {
         let result = sut?.getIPAddress()
         let resultCount = result?.count
         XCTAssertNotEqual(result, nil)
         XCTAssertLessThanOrEqual(resultCount!, 32)
     }
 
-    func testValidateDeviceCountryCode(){
+    func testValidateDeviceCountryCode() {
         let result = sut?.language.count
         XCTAssertEqual(result, 2)
         XCTAssertNotEqual(result, nil)
     }
 
-    func testValidateDeviceLaungageCode(){
+    func testValidateDeviceLaungageCode() {
         let result = sut?.country.count
         XCTAssertEqual(result, 2)
         XCTAssertNotEqual(result, nil)
     }
 
-    func testValidateBatteryLevel(){
+    func testValidateBatteryLevel() {
         let result = sut?.getBattery()
         XCTAssertNotEqual(result, nil)
         XCTAssertLessThanOrEqual(result!, 100)
@@ -64,27 +64,27 @@ class FrameworkFlagrightTests: XCTestCase {
 
     // validates virtuaal device
 
-    func testIsVirtualDevice(){
+    func testIsVirtualDevice() {
         let result = sut?.isSimulator()
         XCTAssertEqual(result, false || true)
     }
 
-    func testNumberOfContacts(){
+    func testNumberOfContacts() {
         let result = sut?.getContacts()
         XCTAssertGreaterThanOrEqual(result!, 0)
     }
 
-    func testRam(){
+    func testRam() {
         let result = sut?.ram
         XCTAssertGreaterThanOrEqual(result!, 0)
     }
 
-    func testMainStorageInGb(){
+    func testMainStorageInGb() {
         let result = sut?.totalMemory()
         XCTAssertGreaterThanOrEqual(result!, 0)
     }
 
-    func testValidateEmit(user: String, type: String){
+    func testValidateEmit(user: String, type: String) {
         sut?.sync()
         sut?.emit(userId: user, type: type)
         let paramCount = sut?.parameters?.count
@@ -97,7 +97,7 @@ class FrameworkFlagrightTests: XCTestCase {
 
     }
 
-    func testValidateInit(apiKey: String, region: String){
+    func testValidateInit(apiKey: String, region: String) {
         sut?.sync()
         sut?.`init`(apikey: apiKey, region: region)
         XCTAssertNotEqual(apiKey, "")
@@ -106,11 +106,11 @@ class FrameworkFlagrightTests: XCTestCase {
         XCTAssertNotEqual(region, "")
     }
 
-    func testValidateEmitFunction(){
+    func testValidateEmitFunction() {
         testValidateEmit(user: userIdVar, type: typeVar)
     }
 
-    func testValidateInitFunction(){
+    func testValidateInitFunction() {
         testValidateInit(apiKey: apiKeyVar, region: regionVar)
     }
 
@@ -125,4 +125,3 @@ class FrameworkFlagrightTests: XCTestCase {
     }
 
 }
-

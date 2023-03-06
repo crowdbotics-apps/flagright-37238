@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-public class LocationHandler: NSObject, CLLocationManagerDelegate{
+public class LocationHandler: NSObject, CLLocationManagerDelegate {
 
 var locationManager: CLLocationManager!
 
@@ -48,22 +48,20 @@ public override init() {
         return latitude
     }
 
-    public func isLocationEnabled() -> Bool{
+    public func isLocationEnabled() -> Bool {
         switch CLLocationManager().authorizationStatus {
-         case .notDetermined, .restricted, .denied:
+        case .notDetermined, .restricted, .denied:
              return false
-         case .authorizedAlways, .authorizedWhenInUse:
+        case .authorizedAlways, .authorizedWhenInUse:
              return true
-         @unknown default:
+        @unknown default:
              break
      }
         return false
     }
 
-  public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
-   {
+  public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
        print("Error")
    }
 
 }
-

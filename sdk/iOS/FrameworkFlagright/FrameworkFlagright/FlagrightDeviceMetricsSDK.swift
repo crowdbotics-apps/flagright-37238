@@ -72,11 +72,10 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
          if carrier1 != nil {
              return carrier1 ?? ""
-         }
-         else if carrier2 != nil {
+         } else if carrier2 != nil {
             return carrier2 ?? ""
          }
-        return ""
+         return ""
 
     }
 
@@ -119,15 +118,14 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
                 return LABiometryType(rawValue: 5) ?? .none
             }
         }
-        if(biometricType.rawValue == 1 || biometricType.rawValue == 2) {
+        if biometricType.rawValue == 1 || biometricType.rawValue == 2 {
             return "Biometrics supported"
-        }
-        else {
+        } else {
             return "Biometrics NOT supported"
     }
     }
 
-     func checkAccessibilityEnabled()-> Bool {
+     func checkAccessibilityEnabled() -> Bool {
         if UIAccessibility.isAssistiveTouchRunning {
             return true
         }
@@ -209,7 +207,7 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
     }
 
     var isConnectedToVpn: Bool {
-        if let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? Dictionary<String, Any>,
+        if let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any],
             let scopes = settings["__SCOPED__"] as? [String: Any] {
             for (key, _) in scopes {
              if key.contains("tap") || key.contains("tun") || key.contains("ppp") || key.contains("ipsec") {
@@ -317,7 +315,7 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
     // change to init
     public func `init`(apikey: String, region: String) {
-        makePostRequest(apiKey: apikey, region: region, parameterDict: parameters ?? ["":""])
+        makePostRequest(apiKey: apikey, region: region, parameterDict: parameters ?? ["": ""])
     }
 
 }
