@@ -61,7 +61,6 @@ public override init() {
     }
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-       print("Error")
    }
 
 }

@@ -14,8 +14,6 @@ import Network
 import LocalAuthentication
 import CoreBluetooth
 
-let networkInfo = CTTelephonyNetworkInfo()
-
 public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
     var parameters: [String: Any]?
@@ -65,19 +63,16 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
 }
 
+// Function to get the network operator name
+
     func carrier() -> String {
-        let carrier1  = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?.first?.value.carrierName
-        let carrier2 = Array(arrayLiteral: networkInfo.serviceSubscriberCellularProviders)[0]?
-            .reversed().first?.value.carrierName
-
-         if carrier1 != nil {
-             return carrier1 ?? ""
-         } else if carrier2 != nil {
-            return carrier2 ?? ""
-         }
-         return ""
-
+        let networkInfo = CTTelephonyNetworkInfo()
+        let carrierName = networkInfo.serviceSubscriberCellularProviders
+        let carrier = carrierName?.compactMap {$0.value.carrierName}
+        return carrier?.first ?? ""
     }
+
+// Function to get total no. of contacts
 
     func getContacts() -> Int {
     do {
@@ -86,10 +81,11 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
              self.contactArray.append(contact.givenName)
          })
      } catch {
-         print("something wrong happened in fetching contacts")
      }
         return contactArray.count
     }
+
+// Function to check for real device or simulator
 
     func isSimulator() -> Bool {
 #if targetEnvironment(simulator)
@@ -99,31 +95,7 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 #endif
     }
 
-    func getBiometricSupported() -> String {
-        var biometricType: LABiometryType {
-            let context = LAContext()
-            var error: NSError?
-            guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else { return .none }
-            if #available(iOS 11.0, *) {
-                switch context.biometryType {
-                case .touchID:
-                        return .touchID
-                case .faceID:
-                        return .faceID
-                case .none:
-                        return .none
-                }
-            } else {
-                guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else { return .none }
-                return LABiometryType(rawValue: 5) ?? .none
-            }
-        }
-        if biometricType.rawValue == 1 || biometricType.rawValue == 2 {
-            return "Biometrics supported"
-        } else {
-            return "Biometrics NOT supported"
-    }
-    }
+// Function to check if accessibility is enabled
 
      func checkAccessibilityEnabled() -> Bool {
         if UIAccessibility.isAssistiveTouchRunning {
@@ -165,15 +137,17 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
         if UIAccessibility.isSpeakSelectionEnabled {
             return true
         }
+// Uncomment the below to check if ShakeToUndo and video autoplay
+
 //        if UIAccessibility.isShakeToUndoEnabled{
 //            return true
-//        }
+//       }
+//        if UIAccessibility.isVideoAutoplayEnabled{
+//            return true
+//      }
         if UIAccessibility.isSwitchControlRunning {
             return true
         }
-//        if UIAccessibility.isVideoAutoplayEnabled{
-//            return true
-//        }
         if UIAccessibility.isVoiceOverRunning {
             return true
         }
@@ -183,6 +157,8 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
         return false
     }
 
+// Function to retrieve the device storage/capacity
+
     func totalMemory() -> Int {
     let fileURL = URL(fileURLWithPath: NSHomeDirectory() as String)
     do {
@@ -190,7 +166,6 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
         if let capacity = values.volumeTotalCapacity {
             return (capacity / (1024 * 1024 * 1024))
         } else {
-            print("Capacity is unavailable")
         }
     } catch {
         print("Error retrieving capacity: \(error.localizedDescription)")
@@ -200,11 +175,15 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
      var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
 
+// Function to retrieve the battery percentage
+
      func getBattery() -> Int {
         UIDevice.current.isBatteryMonitoringEnabled = true
         let level = UIDevice.current.batteryLevel
         return Int(level*100)
     }
+
+// Function to check if device connected to VPN
 
     var isConnectedToVpn: Bool {
         if let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any],
@@ -218,16 +197,7 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
         return false
     }
 
-    func ipAddressType() -> String {
-        let ipAddress: String = getIPAddress()
-        if IPv4Address(ipAddress) != nil {
-            return "valid IPv4 address"
-        } else if IPv6Address(ipAddress) != nil {
-           return "valid IPv6 address"
-        } else {
-            return "neither an IPv4 address nor an IPv6 address"
-        }
-    }
+// Function to retrieve the device IP Address
 
     func getIPAddress() -> String {
         var address: String?
@@ -275,6 +245,8 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
             return Int(since1970 * 1000)
         }
 
+// emit function stores all the device metrics
+
     public func emit(userId: String, type: String, transactionId: String = "") {
           parameters = [
           "userId": userId,
@@ -313,7 +285,7 @@ public class FlagrightDeviceMetricsSDK: NSObject, CBCentralManagerDelegate {
 
     }
 
-    // change to init
+// 'init' function to make the API request call
     public func `init`(apikey: String, region: String) {
         makePostRequest(apiKey: apikey, region: region, parameterDict: parameters ?? ["": ""])
     }

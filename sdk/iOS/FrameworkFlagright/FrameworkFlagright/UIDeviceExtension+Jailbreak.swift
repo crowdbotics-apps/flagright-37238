@@ -27,19 +27,15 @@ private struct JailBrokenHelper {
     }
 
     static func isContainsSuspiciousApps() -> Bool {
-        for path in suspiciousAppsPathToCheck {
-            if FileManager.default.fileExists(atPath: path) {
-                return true
-            }
+        for path in suspiciousAppsPathToCheck where FileManager.default.fileExists(atPath: path) {
+        return true
         }
         return false
     }
 
     static func isSuspiciousSystemPathsExists() -> Bool {
-        for path in suspiciousSystemPathsToCheck {
-            if FileManager.default.fileExists(atPath: path) {
-                return true
-            }
+        for path in suspiciousSystemPathsToCheck where FileManager.default.fileExists(atPath: path) {
+          return true
         }
         return false
     }
