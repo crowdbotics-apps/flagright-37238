@@ -11,7 +11,7 @@ extension UIDevice {
     var isSimulator: Bool {
         return TARGET_OS_SIMULATOR != 0
     }
-    
+
    public func isJailBroken() -> Bool {
             if UIDevice.current.isSimulator { return false }
             if JailBrokenHelper.hasCydiaInstalled() { return true }
@@ -20,30 +20,26 @@ extension UIDevice {
             return JailBrokenHelper.canEditSystemFiles()
     }
 }
-    
+
 private struct JailBrokenHelper {
     static func hasCydiaInstalled() -> Bool {
         return UIApplication.shared.canOpenURL(URL(string: "cydia://")!)
     }
-    
+
     static func isContainsSuspiciousApps() -> Bool {
-        for path in suspiciousAppsPathToCheck {
-            if FileManager.default.fileExists(atPath: path) {
-                return true
-            }
+        for path in suspiciousAppsPathToCheck where FileManager.default.fileExists(atPath: path) {
+        return true
         }
         return false
     }
-    
+
     static func isSuspiciousSystemPathsExists() -> Bool {
-        for path in suspiciousSystemPathsToCheck {
-            if FileManager.default.fileExists(atPath: path) {
-                return true
-            }
+        for path in suspiciousSystemPathsToCheck where FileManager.default.fileExists(atPath: path) {
+          return true
         }
         return false
     }
-    
+
     static func canEditSystemFiles() -> Bool {
         let jailBreakText = "Developer Insider"
         do {
@@ -53,7 +49,7 @@ private struct JailBrokenHelper {
             return false
         }
     }
-    
+
     /**
      Add more paths here to check for jail break
      */
@@ -69,7 +65,7 @@ private struct JailBrokenHelper {
                 "/Applications/WinterBoard.app"
         ]
     }
-    
+
     static var suspiciousSystemPathsToCheck: [String] {
         return ["/Library/MobileSubstrate/DynamicLibraries/LiveClock.plist",
                 "/Library/MobileSubstrate/DynamicLibraries/Veency.plist",
@@ -90,4 +86,3 @@ private struct JailBrokenHelper {
         ]
     }
 }
-
