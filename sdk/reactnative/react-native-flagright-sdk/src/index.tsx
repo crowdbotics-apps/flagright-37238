@@ -76,7 +76,7 @@ export async function emit(
   userId: string,
   transactionId: string | undefined = undefined
 ): Promise<any> {
-  let mApiKey = undefined;
+  let mApiKey;
   try {
     mApiKey = await AsyncStorage.getItem('apiKey');
   } catch (e) {
@@ -109,7 +109,7 @@ export async function emit(
           requestType.batteryLevel = requestType.batteryLevel * 100;
         }
         const externalStorageTotal = await getExternalSdCardSize(false);
-        if (externalStorageTotal != 0) {
+        if (externalStorageTotal !== 0) {
           requestType.externalTotalStorageInGb = await getExternalSdCardSize(
             false
           );

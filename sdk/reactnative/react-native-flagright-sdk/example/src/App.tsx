@@ -81,7 +81,7 @@ export default function App() {
     getDeviceId().then((id) => setDeviceId(id));
     getDeviceLocaleLanguageCode().then((code) => setLanguageCode(code));
     getDeviceLocaleCountry().then((country) => setCountryCode(country));
-    getDeviceTimeZone().then((timeZone) => setTimeZone(timeZone));
+    getDeviceTimeZone().then((tz) => setTimeZone(tz));
     isDataRoamingEnabled().then((enabled) => setRoamingEnabled(enabled));
     isAccessibilityEnabled().then((enabled) => setAccessibility(enabled));
     isBluetoothEnabled().then((bluetoothObj) => {

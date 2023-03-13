@@ -12,6 +12,7 @@ import java.math.BigInteger;
  */
 public class StorageFetcher {
     private static StorageFetcher mStorageFetcher;
+    private final int BYTES = 1024;
 
     private StorageFetcher() {
 
@@ -41,7 +42,7 @@ public class StorageFetcher {
             BigInteger rootDirCapacity = getDirTotalCapacity(rootDir);
             BigInteger dataDirCapacity = getDirTotalCapacity(dataDir);
 
-            return roundAvoid(rootDirCapacity.add(dataDirCapacity).doubleValue() / (1024 * 1024 * 1024),1);
+            return roundAvoid(rootDirCapacity.add(dataDirCapacity).doubleValue() / (BYTES * BYTES * BYTES),1);
 
         } catch (Exception e) {
             return 0;
@@ -65,7 +66,7 @@ public class StorageFetcher {
             long dataBlockSize = dataDir.getBlockSizeLong();
             double dataFree = BigInteger.valueOf(dataAvailableBlocks).multiply(BigInteger.valueOf(dataBlockSize)).doubleValue();
 
-            return roundAvoid((rootFree + dataFree)/(1024 * 1024 * 1024),1);
+            return roundAvoid((rootFree + dataFree)/(BYTES * BYTES * BYTES),1);
         } catch (Exception e) {
             return 0;
         }
@@ -110,12 +111,12 @@ public class StorageFetcher {
                         StatFs sdCardDir = new StatFs(external_storage.getPath());
                         if (!forFreeStorage) {
                             BigInteger rootDirCapacity = getDirTotalCapacity(sdCardDir);
-                            size = rootDirCapacity.doubleValue() / (1024 * 1024 * 1024);
+                            size = rootDirCapacity.doubleValue() / (BYTES * BYTES * BYTES);
                         } else {
                             long sdCardAvailableBlocks = sdCardDir.getAvailableBlocksLong();
                             long sdCardBlockSize = sdCardDir.getBlockSizeLong();
                             double sdCardFree = BigInteger.valueOf(sdCardAvailableBlocks).multiply(BigInteger.valueOf(sdCardBlockSize)).doubleValue();
-                            size = sdCardFree / (1024 * 1024 * 1024);
+                            size = sdCardFree / (BYTES * BYTES * BYTES);
                         }
 
                     } catch (Exception ex) {
@@ -127,7 +128,8 @@ public class StorageFetcher {
 
             return roundAvoid(size, 1);
         }catch (Exception ex) {
-           return 0;
+            size = 0;
+           return size;
         }
     }
 

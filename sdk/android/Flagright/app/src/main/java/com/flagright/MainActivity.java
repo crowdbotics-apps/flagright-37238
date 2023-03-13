@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
         fingerPrint.setText(new StringBuilder()
                 .append("Fingerprint: ")
                 .append(flagrightDeviceMetricsSDK.getFingerprint()));
-        System.out.println("FingerPrint: "+ flagrightDeviceMetricsSDK.getFingerprint());
 
         InitResponse initResponse = flagrightDeviceMetricsSDK.init("123", Region.US1);
         if (initResponse.isSuccess()) {
