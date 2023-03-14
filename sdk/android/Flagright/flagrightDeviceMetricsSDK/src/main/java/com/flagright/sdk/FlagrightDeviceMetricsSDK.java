@@ -27,6 +27,7 @@ import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
 import com.flagright.sdk.models.InitResponse;
 import com.flagright.sdk.models.Region;
+import com.flagright.sdk.models.StorageResponseModal;
 import com.scottyab.rootbeer.RootBeer;
 
 import org.json.JSONException;
@@ -51,13 +52,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FlagrightDeviceMetricsSDK {
-    private enum Type {TRANSACTION, USER_SIGNUP}
-    private static final String BASE_URL =  "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
+    private static final String BASE_URL = "https://stoplight.io/mocks/flagright-device-api/flagright-device-data-api/122980601/";
     private static FlagrightDeviceMetricsSDK mFlagrightDeviceMetricsSDK;
     //    private static RequestModal mRequestModal;
     private static String mApiKey;
     private static Region mRegion;
-
+    private final int BYTES = 1024;
 
     /**
      * Private constructor for singleton
@@ -90,11 +90,11 @@ public class FlagrightDeviceMetricsSDK {
             mApiKey = apiKey;
             mRegion = region;
             Log.i("Region", region.toString());
-           initResponse.setSuccess(true);
+            initResponse.setSuccess(true);
         } else {
             initResponse.setSuccess(false);
             if (!Validator.validateAPIKey(apiKey)) {
-               initResponse.setError("Please add valid apiKey");
+                initResponse.setError("Please add valid apiKey");
             } else {
                 initResponse.setError("Please add valid region");
             }
@@ -107,9 +107,9 @@ public class FlagrightDeviceMetricsSDK {
      * attributes from device and then call the
      * {@link #submitInfo(Context, ResponseCallback, JSONObject) submitInfo} method
      *
-     * @param context Application context
-     * @param userId user id
-     * @param transactionId transaction id
+     * @param context          Application context
+     * @param userId           user id
+     * @param transactionId    transaction id
      * @param responseCallback callback that inform success and failure
      */
     public void emit(Context context, String userId, String transactionId, ResponseCallback responseCallback) {
@@ -117,8 +117,7 @@ public class FlagrightDeviceMetricsSDK {
             JSONObject requestJsonObject = new JSONObject();
             try {
                 requestJsonObject.put("userId", userId);
-                requestJsonObject.put("type", transactionId == null ? Type.USER_SIGNUP.name() :
-                        Type.TRANSACTION.name());
+                requestJsonObject.put("type", transactionId == null ? Type.USER_SIGNUP.name() : Type.TRANSACTION.name());
                 requestJsonObject.put("timestamp", System.currentTimeMillis());
                 if (transactionId != null) {
                     requestJsonObject.put("transactionId", transactionId);
@@ -126,23 +125,22 @@ public class FlagrightDeviceMetricsSDK {
                 requestJsonObject.put("deviceFingerprint", getFingerprint());
                 requestJsonObject.put("isVirtualDevice", isEmulator());
                 String ipAddress4 = getIPAddress(true);
-                if (ipAddress4 != null)
-                    requestJsonObject.put("ipAddress", getIPAddress(true));
+                if (ipAddress4 != null) requestJsonObject.put("ipAddress", getIPAddress(true));
                 int totalContacts = fetchContactsCount(context);
                 // -1 means permission not granted
                 if (totalContacts != -1)
                     requestJsonObject.put("totalNumberOfContacts", totalContacts);
                 requestJsonObject.put("batteryLevel", getBatteryLevel(context).getLevel());
-                double totalExternalStorage = getExternalSdCardSize((false));
-                if (totalExternalStorage != 0) {
-                    requestJsonObject.put("externalTotalStorageInGb", totalExternalStorage);
+                StorageResponseModal externalStorageResponseModal = getExternalSdCardSize((false));
+                if (externalStorageResponseModal.isFound()) {
+                    requestJsonObject.put("externalTotalStorageInGb", externalStorageResponseModal.getStorageInGB());
                     // check for free external storage
-                    requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)));
+                    requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)).getStorageInGB());
                 }
                 requestJsonObject.put("manufacturer", getManufactureName());
-                double mainTotalStorage = getTotalInternalStorage();
-                if (mainTotalStorage != 0) {
-                    requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage);
+                StorageResponseModal mainTotalStorage = getTotalInternalStorage();
+                if (mainTotalStorage.isFound()) {
+                    requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage.getStorageInGB());
                 }
                 requestJsonObject.put("model", getModalName());
                 // operating system object
@@ -182,9 +180,9 @@ public class FlagrightDeviceMetricsSDK {
             } catch (JSONException ex) {
                 responseCallback.onFailure(ex.getMessage());
             }
-        }else {
+        } else {
             if (!Validator.validateContext(context))
-            responseCallback.onFailure("Context is not valid");
+                responseCallback.onFailure("Context is not valid");
             else if (!Validator.validateUserId(userId))
                 responseCallback.onFailure("User Id is not valid");
             else if (!Validator.validateOnSuccessListener(responseCallback)) {
@@ -199,7 +197,23 @@ public class FlagrightDeviceMetricsSDK {
      * @return true if the app is running on the emulator
      */
     public boolean isEmulator() {
-        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) || Build.FINGERPRINT.startsWith("generic") || Build.FINGERPRINT.startsWith("unknown") || Build.HARDWARE.contains("goldfish") || Build.HARDWARE.contains("ranchu") || Build.MODEL.contains("google_sdk") || Build.MODEL.contains("Emulator") || Build.MODEL.contains("Android SDK built for x86") || Build.MANUFACTURER.contains("Genymotion") || Build.PRODUCT.contains("sdk_google") || Build.PRODUCT.contains("google_sdk") || Build.PRODUCT.contains("sdk") || Build.PRODUCT.contains("sdk_x86") || Build.PRODUCT.contains("sdk_gphone64_arm64") || Build.PRODUCT.contains("vbox86p") || Build.PRODUCT.contains("emulator") || Build.PRODUCT.contains("simulator");
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("sdk_gphone64_arm64")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator");
     }
 
     /**
@@ -304,7 +318,8 @@ public class FlagrightDeviceMetricsSDK {
      * @param locationFoundCallback {@link LocationFoundCallback} it an interface that returns location on success otherwise error
      */
     public void fetchCurrentLocation(Context context, LocationFoundCallback locationFoundCallback) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationFetcher fetcher = new LocationFetcher();
             fetcher.init(context, locationFoundCallback);
         } else {
@@ -339,7 +354,7 @@ public class FlagrightDeviceMetricsSDK {
      *
      * @return size of internal storage in GB
      */
-    public double getTotalInternalStorage() {
+    public StorageResponseModal getTotalInternalStorage() {
         return StorageFetcher.getInstance().getTotalInternalStorage();
     }
 
@@ -348,7 +363,7 @@ public class FlagrightDeviceMetricsSDK {
      *
      * @return available internal storage in GB
      */
-    public double getFreeInternalStorage() {
+    public StorageResponseModal getFreeInternalStorage() {
         return StorageFetcher.getInstance().getFreeInternalStorage();
     }
 
@@ -360,7 +375,7 @@ public class FlagrightDeviceMetricsSDK {
      *                       otherwise return the total size
      * @return size of the external storage in GB
      */
-    public double getExternalSdCardSize(boolean forFreeStorage) {
+    public StorageResponseModal getExternalSdCardSize(boolean forFreeStorage) {
         return StorageFetcher.getInstance().getExternalSdCardSize(forFreeStorage);
     }
 
@@ -445,9 +460,8 @@ public class FlagrightDeviceMetricsSDK {
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
         activityManager.getMemoryInfo(memoryInfo);
 
-        double scale = Math.pow(10, 0);
-        double value = ((double) memoryInfo.totalMem) / (1024 * 1024 * 1024);
-        return Math.round(value * scale) / scale;
+        double value = ((double) memoryInfo.totalMem) / (BYTES * BYTES * BYTES);
+        return Math.round(value);
     }
 
     /**
@@ -461,7 +475,6 @@ public class FlagrightDeviceMetricsSDK {
         try {
             // return true or false if data roaming is enabled or not
             int isEnabled = Settings.Secure.getInt(context.getContentResolver(), Settings.Global.DATA_ROAMING);
-            System.out.println("isEnabled: " + isEnabled);
             return isEnabled == 1;
         } catch (Settings.SettingNotFoundException e) {
             // return null if no such settings exist (device with no radio data ?)
@@ -558,13 +571,12 @@ public class FlagrightDeviceMetricsSDK {
 
 
             // calling a method to create a post and passing our modal class.
-            RequestBody requestBody = RequestBody.create(MediaType.parse
-                    ("application/json; charset=utf-8"), requestJsonObject.toString());
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), requestJsonObject.toString());
             Call<Void> call = retrofitAPI.sendData(mApiKey, requestBody);
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    Log.i("API", response.code() + " " + call.request().body() + " " + call.request().headers().toString());
+                    Log.i("API", response.code() + " " + call.request().body() + " " + call.request().headers());
                     if (response.code() == 200) {
                         responseCallback.onSuccess();
                     }
@@ -581,5 +593,7 @@ public class FlagrightDeviceMetricsSDK {
             responseCallback.onFailure("API key is not assigned");
         }
     }
+
+    private enum Type {TRANSACTION, USER_SIGNUP}
 
 }

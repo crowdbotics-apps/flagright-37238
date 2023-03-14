@@ -4,6 +4,8 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
 
+import com.flagright.sdk.models.StorageResponseModal;
+
 import java.io.File;
 import java.math.BigInteger;
 
@@ -12,6 +14,7 @@ import java.math.BigInteger;
  */
 public class StorageFetcher {
     private static StorageFetcher mStorageFetcher;
+    private final int BYTES = 1024;
 
     private StorageFetcher() {
 
@@ -33,7 +36,8 @@ public class StorageFetcher {
      * Method return the total internal storage in GB provided by {@link Environment} class of Android SDK
      * @return size of internal storage in GB
      */
-    public double getTotalInternalStorage() {
+    public StorageResponseModal getTotalInternalStorage() {
+        StorageResponseModal storageResponseModal = new StorageResponseModal();
         try {
             StatFs rootDir = new StatFs(Environment.getRootDirectory().getAbsolutePath());
             StatFs dataDir = new StatFs(Environment.getDataDirectory().getAbsolutePath());
@@ -41,10 +45,13 @@ public class StorageFetcher {
             BigInteger rootDirCapacity = getDirTotalCapacity(rootDir);
             BigInteger dataDirCapacity = getDirTotalCapacity(dataDir);
 
-            return roundAvoid(rootDirCapacity.add(dataDirCapacity).doubleValue() / (1024 * 1024 * 1024),1);
-
+            double storageInGB = roundAvoid(rootDirCapacity.add(dataDirCapacity).doubleValue() / (BYTES * BYTES * BYTES),1);
+            storageResponseModal.setFound(true);
+            storageResponseModal.setStorageInGB(storageInGB);
+            return  storageResponseModal;
         } catch (Exception e) {
-            return 0;
+            storageResponseModal.setFound(false);
+            return storageResponseModal;
         }
     }
 
@@ -52,7 +59,8 @@ public class StorageFetcher {
      * Method calculate the available internal storage in GB
      * @return available internal storage in GB
      */
-    public double getFreeInternalStorage() {
+    public StorageResponseModal getFreeInternalStorage() {
+        StorageResponseModal storageResponseModal = new StorageResponseModal();
         try {
             StatFs rootDir = new StatFs(Environment.getRootDirectory().getAbsolutePath());
             StatFs dataDir = new StatFs(Environment.getDataDirectory().getAbsolutePath());
@@ -64,10 +72,12 @@ public class StorageFetcher {
             long dataAvailableBlocks = dataDir.getAvailableBlocksLong();
             long dataBlockSize = dataDir.getBlockSizeLong();
             double dataFree = BigInteger.valueOf(dataAvailableBlocks).multiply(BigInteger.valueOf(dataBlockSize)).doubleValue();
-
-            return roundAvoid((rootFree + dataFree)/(1024 * 1024 * 1024),1);
+            storageResponseModal.setFound(true);
+            storageResponseModal.setStorageInGB(roundAvoid((rootFree + dataFree)/(BYTES * BYTES * BYTES),1));
+            return storageResponseModal;
         } catch (Exception e) {
-            return 0;
+            storageResponseModal.setFound(false);
+            return storageResponseModal;
         }
     }
 
@@ -78,16 +88,17 @@ public class StorageFetcher {
      *                       otherwise return the total size
      * @return size of the external storage in GB
      */
-    public double getExternalSdCardSize(boolean forFreeStorage) {
+    public StorageResponseModal getExternalSdCardSize(boolean forFreeStorage) {
+        StorageResponseModal storageResponseModal = new StorageResponseModal();
         File storage = new File("/storage");
         String external_storage_path = "";
         double size = 0;
-
         try {
 
             if (storage.exists()) {
                 File[] files = storage.listFiles();
 
+                if (files != null) {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
@@ -101,6 +112,7 @@ public class StorageFetcher {
                         }
                     }
                 }
+                }
             }
 
             if (!external_storage_path.isEmpty()) {
@@ -110,24 +122,25 @@ public class StorageFetcher {
                         StatFs sdCardDir = new StatFs(external_storage.getPath());
                         if (!forFreeStorage) {
                             BigInteger rootDirCapacity = getDirTotalCapacity(sdCardDir);
-                            size = rootDirCapacity.doubleValue() / (1024 * 1024 * 1024);
+                            size = rootDirCapacity.doubleValue() / (BYTES * BYTES * BYTES);
                         } else {
                             long sdCardAvailableBlocks = sdCardDir.getAvailableBlocksLong();
                             long sdCardBlockSize = sdCardDir.getBlockSizeLong();
                             double sdCardFree = BigInteger.valueOf(sdCardAvailableBlocks).multiply(BigInteger.valueOf(sdCardBlockSize)).doubleValue();
-                            size = sdCardFree / (1024 * 1024 * 1024);
+                            size = sdCardFree / (BYTES * BYTES * BYTES);
                         }
 
                     } catch (Exception ex) {
                         size = 0;
                     }
-//                size = totalSize(external_storage);
                 }
             }
-
-            return roundAvoid(size, 1);
+            storageResponseModal.setFound(true);
+            storageResponseModal.setStorageInGB(roundAvoid(size, 1));
+            return storageResponseModal;
         }catch (Exception ex) {
-           return 0;
+           storageResponseModal.setFound(false);
+           return storageResponseModal;
         }
     }
 
