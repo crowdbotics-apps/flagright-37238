@@ -27,6 +27,7 @@ import com.flagright.sdk.models.BatteryInfoModel;
 import com.flagright.sdk.models.BluetoothResponseModal;
 import com.flagright.sdk.models.InitResponse;
 import com.flagright.sdk.models.Region;
+import com.flagright.sdk.models.StorageResponseModal;
 import com.scottyab.rootbeer.RootBeer;
 
 import org.json.JSONException;
@@ -130,16 +131,16 @@ public class FlagrightDeviceMetricsSDK {
                 if (totalContacts != -1)
                     requestJsonObject.put("totalNumberOfContacts", totalContacts);
                 requestJsonObject.put("batteryLevel", getBatteryLevel(context).getLevel());
-                double totalExternalStorage = getExternalSdCardSize((false));
-                if (totalExternalStorage != 0) {
-                    requestJsonObject.put("externalTotalStorageInGb", totalExternalStorage);
+                StorageResponseModal externalStorageResponseModal = getExternalSdCardSize((false));
+                if (externalStorageResponseModal.isFound()) {
+                    requestJsonObject.put("externalTotalStorageInGb", externalStorageResponseModal.getStorageInGB());
                     // check for free external storage
-                    requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)));
+                    requestJsonObject.put("externalFreeStorageInGb", getExternalSdCardSize((true)).getStorageInGB());
                 }
                 requestJsonObject.put("manufacturer", getManufactureName());
-                double mainTotalStorage = getTotalInternalStorage();
-                if (mainTotalStorage != 0) {
-                    requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage);
+                StorageResponseModal mainTotalStorage = getTotalInternalStorage();
+                if (mainTotalStorage.isFound()) {
+                    requestJsonObject.put("mainTotalStorageInGb", mainTotalStorage.getStorageInGB());
                 }
                 requestJsonObject.put("model", getModalName());
                 // operating system object
@@ -353,7 +354,7 @@ public class FlagrightDeviceMetricsSDK {
      *
      * @return size of internal storage in GB
      */
-    public double getTotalInternalStorage() {
+    public StorageResponseModal getTotalInternalStorage() {
         return StorageFetcher.getInstance().getTotalInternalStorage();
     }
 
@@ -362,7 +363,7 @@ public class FlagrightDeviceMetricsSDK {
      *
      * @return available internal storage in GB
      */
-    public double getFreeInternalStorage() {
+    public StorageResponseModal getFreeInternalStorage() {
         return StorageFetcher.getInstance().getFreeInternalStorage();
     }
 
@@ -374,7 +375,7 @@ public class FlagrightDeviceMetricsSDK {
      *                       otherwise return the total size
      * @return size of the external storage in GB
      */
-    public double getExternalSdCardSize(boolean forFreeStorage) {
+    public StorageResponseModal getExternalSdCardSize(boolean forFreeStorage) {
         return StorageFetcher.getInstance().getExternalSdCardSize(forFreeStorage);
     }
 

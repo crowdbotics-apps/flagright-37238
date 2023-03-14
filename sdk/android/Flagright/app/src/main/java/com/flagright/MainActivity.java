@@ -17,6 +17,7 @@ import com.flagright.sdk.interfaces.LocationFoundCallback;
 import com.flagright.sdk.interfaces.ResponseCallback;
 import com.flagright.sdk.models.InitResponse;
 import com.flagright.sdk.models.Region;
+import com.flagright.sdk.models.StorageResponseModal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,24 +71,24 @@ public class MainActivity extends AppCompatActivity {
         TextView internalStorageTextView = findViewById(R.id.internalStorage);
         internalStorageTextView.setText(new StringBuilder()
                 .append("Storage: ")
-                .append(flagrightDeviceMetricsSDK.getTotalInternalStorage()).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getTotalInternalStorage().getStorageInGB()).append(" GB"));
 
         // free internal storage
         TextView freeInternalStorageTextView = findViewById(R.id.freeInternal);
         freeInternalStorageTextView.setText(new StringBuilder()
                 .append("Free Storage: ")
-                .append(flagrightDeviceMetricsSDK.getFreeInternalStorage()).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getFreeInternalStorage().getStorageInGB()).append(" GB"));
 
         // total external storage
         TextView totalExternalStorage = findViewById(R.id.totalExternalStorage);
         totalExternalStorage.setText(new StringBuilder()
                 .append("External Storage: ")
-                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(false)).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(false).getStorageInGB()).append(" GB"));
         //free external storage
         TextView freeExternalStorage = findViewById(R.id.freeExternalStorage);
         freeExternalStorage.setText(new StringBuilder()
                 .append("External Storage Free: ")
-                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(true)).append(" GB"));
+                .append(flagrightDeviceMetricsSDK.getExternalSdCardSize(true).getStorageInGB()).append(" GB"));
         // get Modal name
         TextView modal = findViewById(R.id.modal);
         modal.setText(new StringBuilder()
